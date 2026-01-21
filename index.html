@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Monitoreo Rosas 🌹</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#d63384">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <!-- Notificaciones -->
+    <div id="notificaciones" class="notificaciones-container"></div>
+
+    <!-- Pantalla de Login Inicial (aparece al cargar) -->
+    <div id="login-inicial" class="login-inicial">
+        <div class="login-inicial-content">
+            <div class="login-inicial-header">
+                <i class="fas fa-rose"></i>
+                <h1>Sistema de Monitoreo de Rosas</h1>
+                <p>Versión 3.0 | Panel de Administración</p>
+            </div>
+            
+            <div class="login-inicial-form">
+                <h2><i class="fas fa-user-lock"></i> Iniciar Sesión</h2>
+                <div class="campo">
+                    <label for="login-usuario"><i class="fas fa-user"></i> Usuario:</label>
+                    <input type="text" id="login-usuario" placeholder="">
+                </div>
+                <div class="campo">
+                    <label for="login-password"><i class="fas fa-key"></i> Contraseña:</label>
+                    <input type="password" id="login-password" placeholder="">
+                </div>
+                <div class="login-inicial-botones">
+                    <button class="btn-login-inicial" onclick="verificarLoginInicial()">
+                        <i class="fas fa-sign-in-alt"></i> Ingresar al Sistema
+                    </button>
+                </div>
+                <div class="login-info">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Administración -->
+    <div id="admin-panel" class="admin-panel">
+        <div class="admin-content">
+            <div class="admin-header">
+                <h2><i class="fas fa-cogs"></i> Panel de Administración</h2>
+                <button class="btn-cerrar-admin" onclick="cerrarPanelAdmin()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="admin-tabs">
+                <div class="admin-tab activa" onclick="cambiarAdminTab('usuarios')">
+                    <i class="fas fa-users"></i> Usuarios
+                </div>
+                <div class="admin-tab" onclick="cambiarAdminTab('contenido')">
+                    <i class="fas fa-edit"></i> Contenido
+                </div>
+                <div class="admin-tab" onclick="cambiarAdminTab('configuracion')">
+                    <i class="fas fa-cog"></i> Configuración
+                </div>
+            </div>
+            
+            <div class="admin-contenido">
+                <!-- Gestión de Usuarios -->
+                <div id="admin-usuarios" class="admin-seccion activa">
+                    <h3><i class="fas fa-user-plus"></i> Gestión de Usuarios</h3>
+                    <div class="admin-formulario">
+                        <div class="campo">
+                            <label for="nuevo-usuario">Usuario:</label>
+                            <input type="text" id="nuevo-usuario" placeholder="Nombre de usuario">
+                        </div>
+                        <div class="campo">
+                            <label for="nueva-password">Contraseña:</label>
+                            <input type="password" id="nueva-password" placeholder="Contraseña">
+                        </div>
+                        <div class="campo">
+                            <label for="nuevo-rol">Rol:</label>
+                            <select id="nuevo-rol">
+                                <option value="admin">Administrador</option>
+                                <option value="supervisor">Supervisor</option>
+                                <option value="operario">Operario</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="nuevo-nombre">Nombre completo:</label>
+                            <input type="text" id="nuevo-nombre" placeholder="Nombre completo">
+                        </div>
+                        <button class="btn-admin" onclick="agregarUsuario()">
+                            <i class="fas fa-plus"></i> Agregar Usuario
+                        </button>
+                    </div>
+                    
+                    <div class="admin-lista">
+                        <h4>Usuarios Registrados</h4>
+                        <div id="lista-usuarios" class="lista-usuarios"></div>
+                    </div>
+                </div>
+                
+                <!-- Gestión de Contenido -->
+                <div id="admin-contenido" class="admin-seccion">
+                    <h3><i class="fas fa-file-alt"></i> Gestión de Contenido</h3>
+                    <div class="admin-formulario">
+                        <div class="campo">
+                            <label for="titulo-contenido">Título:</label>
+                            <input type="text" id="titulo-contenido" placeholder="Título del contenido">
+                        </div>
+                        <div class="campo">
+                            <label for="tipo-contenido">Tipo:</label>
+                            <select id="tipo-contenido">
+                                <option value="noticia">Noticia</option>
+                                <option value="informacion">Información</option>
+                                <option value="instruccion">Instrucción</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="descripcion-contenido">Descripción:</label>
+                            <textarea id="descripcion-contenido" rows="4" placeholder="Descripción del contenido"></textarea>
+                        </div>
+                        <button class="btn-admin" onclick="agregarContenido()">
+                            <i class="fas fa-plus"></i> Agregar Contenido
+                        </button>
+                    </div>
+                    
+                    <div class="admin-lista">
+                        <h4>Contenido Existente</h4>
+                        <div id="lista-contenido" class="lista-contenido"></div>
+                    </div>
+                </div>
+                
+                <!-- Configuración del Sistema -->
+                <div id="admin-configuracion" class="admin-seccion">
+                    <h3><i class="fas fa-sliders-h"></i> Configuración del Sistema</h3>
+                    <div class="configuracion-opciones">
+                        <div class="configuracion-item">
+                            <label>
+                                <input type="checkbox" id="auto-backup"> Backup automático diario
+                            </label>
+                        </div>
+                        <div class="configuracion-item">
+                            <label>
+                                <input type="checkbox" id="notificaciones-email"> Notificaciones por email
+                            </label>
+                        </div>
+                         <!-- ELIMINA o COMENTA este bloque completo:
+        <div class="configuracion-item">
+            <label for="limite-registros">Límite de registros por página:</label>
+            <select id="limite-registros">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        -->
+                        <button class="btn-admin" onclick="guardarConfiguracion()">
+                            <i class="fas fa-save"></i> Guardar Configuración
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aplicación principal (oculta hasta login) -->
+    <div id="app-contenedor" style="display: none;">
+        <!-- Header con botones de control -->
+        <div class="control-bar">
+            <div class="control-left">
+                <button id="toggle-modo" class="btn-control" onclick="toggleModoOscuro()">
+                    <i class="fas fa-moon"></i> Modo Oscuro
+                </button>
+                <button class="btn-control" onclick="abrirPanelAdmin()">
+                    <i class="fas fa-cogs"></i> Admin
+                </button>
+            </div>
+            <div class="control-right">
+                <button class="btn-control" onclick="realizarBackup()">
+                    <i class="fas fa-save"></i> Backup
+                </button>
+                <button class="btn-control" onclick="cerrarSesion()">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+                <span id="usuario-actual" class="usuario-actual">Visitante</span>
+            </div>
+        </div>
+
+        <div class="container">
+            <header>
+                <div class="header-content">
+                    <h1><i class="fas fa-rose"></i> SISTEMA DE MONITOREO DE ROSAS</h1>
+                    <p class="subtitulo">Versión 3.0 | Con Panel de Administración</p>
+                    <p class="subtitulo">Creado por: Cristian Calderón</p>
+                    <div class="header-stats">
+                        <span><i class="fas fa-database"></i> <span id="total-registros-header">0</span> registros</span>
+                        <span><i class="fas fa-sync-alt"></i> Último registro: <span id="ultima-sincronizacion">Nunca</span></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Pestañas principales (sin Estadísticas) -->
+            <div class="pestanas">
+                <div class="pestana activa" onclick="cambiarPestana('formulario')">
+                    <i class="fas fa-edit"></i> FORMULARIO
+                </div>
+                <div class="pestana" onclick="cambiarPestana('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i> DASHBOARD
+                </div>
+            </div>
+
+            <!-- Contenido de las pestañas -->
+            <div class="contenido-principal">
+                <!-- Pestaña 1: FORMULARIO -->
+                <div id="pestana-formulario" class="contenido-pestana activa">
+                    <!-- Panel de selección -->
+                    <div class="panel-seleccion">
+                        <div class="campo">
+                            <label for="fecha"><i class="fas fa-calendar-alt"></i> FECHA</label>
+                            <input type="date" id="fecha" value="">
+                        </div>
+                        <div class="campo">
+                            <label for="bloque"><i class="fas fa-cube"></i> BLOQUE</label>
+                            <select id="bloque" onchange="cargarVariedades()">
+                                <option value="">Seleccione bloque</option>
+                                <option value="1">Bloque 1</option>
+                                <option value="2">Bloque 2</option>
+                                <option value="3">Bloque 3</option>
+                                <option value="4">Bloque 4</option>
+                                <option value="5">Bloque 5</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="variedad"><i class="fas fa-rose"></i> VARIEDAD</label>
+                            <select id="variedad" onchange="cargarCamas()" disabled>
+                                <option value="">Primero seleccione bloque</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="nro_cama"><i class="fas fa-bed"></i> N° CAMA</label>
+                            <select id="nro_cama" onchange="cargarCodigo()" disabled>
+                                <option value="">Primero seleccione variedad</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="codigo"><i class="fas fa-tag"></i> CÓDIGO</label>
+                            <input type="text" id="codigo" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Panel de recomendaciones -->
+                    <div id="panel-recomendaciones" class="panel-recomendaciones">
+                        <div class="recomendaciones-header">
+                            <h3><i class="fas fa-lightbulb"></i> Recomendaciones</h3>
+                            <button onclick="cerrarRecomendaciones()"><i class="fas fa-times"></i></button>
+                        </div>
+                        <div id="recomendaciones-contenido" class="recomendaciones-contenido"></div>
+                    </div>
+
+                    <!-- Categorías organizadas -->
+                    <div class="categorias-container">
+                        <!-- ENFERMEDADES -->
+                        <div class="categoria enfermedades">
+                            <h3><i class="fas fa-virus"></i> ENFERMEDADES</h3>
+                            <div class="categoria-content" id="enfermedades-lista"></div>
+                        </div>
+                        
+                        <!-- PLAGAS -->
+                        <div class="categoria plagas">
+                            <h3><i class="fas fa-bug"></i> PLAGAS</h3>
+                            <div class="categoria-content" id="plagas-lista"></div>
+                        </div>
+                        
+                        <!-- MANEJO CULTURAL -->
+                        <div class="categoria manejo">
+                            <h3><i class="fas fa-cut"></i> MANEJO CULTURAL</h3>
+                            <div class="categoria-content" id="manejo-lista"></div>
+                        </div>
+                        
+                        <!-- MANTENIMIENTO -->
+                        <div class="categoria mantenimiento">
+                            <h3><i class="fas fa-tools"></i> MANTENIMIENTO</h3>
+                            <div class="categoria-content" id="mantenimiento-lista"></div>
+                        </div>
+                    </div>
+
+                    <!-- Resumen -->
+                    <div class="resumen">
+                        <h3><i class="fas fa-chart-bar"></i> RESUMEN</h3>
+                        <div class="resumen-info">
+                            <div class="info-item">
+                                <strong><i class="fas fa-map-marker-alt"></i> Selección:</strong>
+                                <span id="resumen-seleccion">No seleccionado</span>
+                            </div>
+                            <div class="info-item">
+                                <strong><i class="fas fa-exclamation-circle"></i> Problemas detectados:</strong>
+                                <span id="total-problemas">0</span>
+                            </div>
+                            <div class="info-item">
+                                <strong><i class="fas fa-clock"></i> Último registro:</strong>
+                                <span id="ultimo-registro">Ninguno</span>
+                            </div>
+                            <div class="info-item">
+                                <strong><i class="fas fa-chart-line"></i> Puntos totales:</strong>
+                                <span id="puntos-totales">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones principales -->
+                    <div class="botones">
+                        <button class="btn-guardar" onclick="guardarRegistro()">
+                            <i class="fas fa-save"></i> GUARDAR
+                        </button>
+                        <button class="btn-limpiar" onclick="limpiarFormulario()">
+                            <i class="fas fa-broom"></i> LIMPIAR
+                        </button>
+                        <button class="btn-exportar" onclick="exportarExcelPerfecto()">
+                            <i class="fas fa-file-excel"></i> EXPORTAR EXCEL
+                        </button>
+                        <button onclick="verRegistrosModal()">
+                            <i class="fas fa-list"></i> VER REGISTROS
+                        </button>
+                        <button class="btn-whatsapp" onclick="enviarReporteWhatsApp()">
+                            <i class="fab fa-whatsapp"></i> WHATSAPP
+                        </button>
+                        <button class="btn-eliminar-todos" onclick="eliminarTodosRegistros()">
+                            <i class="fas fa-trash-alt"></i> ELIMINAR TODOS
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Pestaña 2: DASHBOARD (sin Estadísticas) -->
+                <div id="pestana-dashboard" class="contenido-pestana">
+                    <div class="estadisticas-header">
+                        <h2><i class="fas fa-tachometer-alt"></i> DASHBOARD</h2>
+                        <p class="subtitulo">Vista general y métricas en tiempo real</p>
+                    </div>
+                    
+                    <!-- Filtros del dashboard -->
+                    <div class="estadisticas-filtros">
+                        <div class="campo">
+                            <label for="dashboard-fecha-inicio"><i class="fas fa-calendar-alt"></i> Desde:</label>
+                            <input type="date" id="dashboard-fecha-inicio">
+                        </div>
+                        <div class="campo">
+                            <label for="dashboard-fecha-fin"><i class="fas fa-calendar-alt"></i> Hasta:</label>
+                            <input type="date" id="dashboard-fecha-fin">
+                        </div>
+                        <div class="campo">
+                            <label for="dashboard-bloque"><i class="fas fa-cube"></i> Bloque:</label>
+                            <select id="dashboard-bloque">
+                                <option value="">Todos los bloques</option>
+                                <option value="1">Bloque 1</option>
+                                <option value="2">Bloque 2</option>
+                                <option value="3">Bloque 3</option>
+                                <option value="4">Bloque 4</option>
+                                <option value="5">Bloque 5</option>
+                            </select>
+                        </div>
+                        <button onclick="actualizarDashboard()" class="btn-actualizar">
+                            <i class="fas fa-sync-alt"></i> Actualizar Dashboard
+                        </button>
+                    </div>
+                    
+                    <!-- KPI Cards -->
+                    <div class="kpi-container">
+                        <div class="kpi-card">
+                            <div class="kpi-icon" style="background: linear-gradient(135deg, #6f42c1, #6610f2);">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="kpi-content">
+                                <h3>Total Registros</h3>
+                                <div class="kpi-value" id="kpi-registros">0</div>
+                                <div class="kpi-trend" id="kpi-trend-registros">-</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon" style="background: linear-gradient(135deg, #20c997, #198754);">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="kpi-content">
+                                <h3>Puntos Totales</h3>
+                                <div class="kpi-value" id="kpi-puntos">0</div>
+                                <div class="kpi-trend" id="kpi-trend-puntos">-</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon" style="background: linear-gradient(135deg, #fd7e14, #dc3545);">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="kpi-content">
+                                <h3>Problemas Detectados</h3>
+                                <div class="kpi-value" id="kpi-problemas">0</div>
+                                <div class="kpi-trend" id="kpi-trend-problemas">-</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon" style="background: linear-gradient(135deg, #17a2b8, #0d6efd);">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="kpi-content">
+                                <h3>Promedio por Registro</h3>
+                                <div class="kpi-value" id="kpi-promedio">0</div>
+                                <div class="kpi-trend" id="kpi-trend-promedio">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráficos principales -->
+                    <div class="graficos-container">
+                        <div class="grafico-card">
+                            <div class="grafico-header">
+                                <h3><i class="fas fa-chart-pie"></i> Distribución por Categorías</h3>
+                            </div>
+                            <div class="grafico-body">
+                                <canvas id="dashboard-grafico-categorias"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="grafico-card">
+                            <div class="grafico-header">
+                                <h3><i class="fas fa-chart-bar"></i> Puntos por Bloque</h3>
+                            </div>
+                            <div class="grafico-body">
+                                <canvas id="dashboard-grafico-bloques"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Últimos registros -->
+                    <div class="tabla-card">
+                        <div class="tabla-header">
+                            <h3><i class="fas fa-history"></i> Últimos Registros</h3>
+                        </div>
+                        <div class="tabla-body">
+                            <table class="tabla-estadistica" id="dashboard-tabla-ultimos">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Bloque</th>
+                                        <th>Variedad</th>
+                                        <th>Problemas</th>
+                                        <th>Puntos</th>
+                                        <th>Severidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-tabla-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver registros -->
+    <div id="modalRegistros" class="modal">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h2><i class="fas fa-list"></i> REGISTROS GUARDADOS</h2>
+                <button class="modal-cerrar" onclick="cerrarModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="lista-registros-container" class="lista-registros"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script principal -->
+    <script src="app.js"></script>
+</body>
+</html>
