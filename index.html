@@ -15,7 +15,7 @@
     <!-- Notificaciones -->
     <div id="notificaciones" class="notificaciones-container"></div>
 
-    <!-- Pantalla de Login Inicial (aparece al cargar) -->
+    <!-- Pantalla de Login Inicial -->
     <div id="login-inicial" class="login-inicial">
         <div class="login-inicial-content">
             <div class="login-inicial-header">
@@ -28,11 +28,11 @@
                 <h2><i class="fas fa-user-lock"></i> Iniciar Sesión</h2>
                 <div class="campo">
                     <label for="login-usuario"><i class="fas fa-user"></i> Usuario:</label>
-                    <input type="text" id="login-usuario" placeholder="">
+                    <input type="text" id="login-usuario" placeholder="Ingrese usuario">
                 </div>
                 <div class="campo">
                     <label for="login-password"><i class="fas fa-key"></i> Contraseña:</label>
-                    <input type="password" id="login-password" placeholder="">
+                    <input type="password" id="login-password" placeholder="Ingrese contraseña">
                 </div>
                 <div class="login-inicial-botones">
                     <button class="btn-login-inicial" onclick="verificarLoginInicial()">
@@ -40,7 +40,8 @@
                     </button>
                 </div>
                 <div class="login-info">
-                    
+                    <p>Usuarios por defecto:</p>
+                    <small>admin/admin123 | cristian/1234 | supervisor/super123 | operario/oper123</small>
                 </div>
             </div>
         </div>
@@ -149,17 +150,6 @@
                                 <input type="checkbox" id="notificaciones-email"> Notificaciones por email
                             </label>
                         </div>
-                         <!-- ELIMINA o COMENTA este bloque completo:
-        <div class="configuracion-item">
-            <label for="limite-registros">Límite de registros por página:</label>
-            <select id="limite-registros">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-        </div>
-        -->
                         <button class="btn-admin" onclick="guardarConfiguracion()">
                             <i class="fas fa-save"></i> Guardar Configuración
                         </button>
@@ -169,7 +159,7 @@
         </div>
     </div>
 
-    <!-- Aplicación principal (oculta hasta login) -->
+    <!-- Aplicación principal -->
     <div id="app-contenedor" style="display: none;">
         <!-- Header con botones de control -->
         <div class="control-bar">
@@ -205,7 +195,7 @@
                 </div>
             </header>
 
-            <!-- Pestañas principales (sin Estadísticas) -->
+            <!-- Pestañas principales -->
             <div class="pestanas">
                 <div class="pestana activa" onclick="cambiarPestana('formulario')">
                     <i class="fas fa-edit"></i> FORMULARIO
@@ -223,7 +213,7 @@
                     <div class="panel-seleccion">
                         <div class="campo">
                             <label for="fecha"><i class="fas fa-calendar-alt"></i> FECHA</label>
-                            <input type="date" id="fecha" value="">
+                            <input type="date" id="fecha">
                         </div>
                         <div class="campo">
                             <label for="bloque"><i class="fas fa-cube"></i> BLOQUE</label>
@@ -255,35 +245,28 @@
                     </div>
 
                     <!-- Panel de recomendaciones -->
-                    <div id="panel-recomendaciones" class="panel-recomendaciones">
+                    <div id="panel-recomendaciones" class="panel-recomendaciones" style="display: none;">
                         <div class="recomendaciones-header">
                             <h3><i class="fas fa-lightbulb"></i> Recomendaciones</h3>
                             <button onclick="cerrarRecomendaciones()"><i class="fas fa-times"></i></button>
                         </div>
-                        <div id="recomendaciones-contenido" class="recomendaciones-contenido"></div>
+                        <div id="recomendaciones-contenido"></div>
                     </div>
 
                     <!-- Categorías organizadas -->
                     <div class="categorias-container">
-                        <!-- ENFERMEDADES -->
                         <div class="categoria enfermedades">
                             <h3><i class="fas fa-virus"></i> ENFERMEDADES</h3>
                             <div class="categoria-content" id="enfermedades-lista"></div>
                         </div>
-                        
-                        <!-- PLAGAS -->
                         <div class="categoria plagas">
                             <h3><i class="fas fa-bug"></i> PLAGAS</h3>
                             <div class="categoria-content" id="plagas-lista"></div>
                         </div>
-                        
-                        <!-- MANEJO CULTURAL -->
                         <div class="categoria manejo">
                             <h3><i class="fas fa-cut"></i> MANEJO CULTURAL</h3>
                             <div class="categoria-content" id="manejo-lista"></div>
                         </div>
-                        
-                        <!-- MANTENIMIENTO -->
                         <div class="categoria mantenimiento">
                             <h3><i class="fas fa-tools"></i> MANTENIMIENTO</h3>
                             <div class="categoria-content" id="mantenimiento-lista"></div>
@@ -336,27 +319,26 @@
                     </div>
                 </div>
                 
-                <!-- Pestaña 2: DASHBOARD (sin Estadísticas) -->
+                <!-- Pestaña 2: DASHBOARD -->
                 <div id="pestana-dashboard" class="contenido-pestana">
                     <div class="estadisticas-header">
                         <h2><i class="fas fa-tachometer-alt"></i> DASHBOARD</h2>
                         <p class="subtitulo">Vista general y métricas en tiempo real</p>
                     </div>
                     
-                    <!-- Filtros del dashboard -->
                     <div class="estadisticas-filtros">
                         <div class="campo">
-                            <label for="dashboard-fecha-inicio"><i class="fas fa-calendar-alt"></i> Desde:</label>
+                            <label for="dashboard-fecha-inicio">Desde:</label>
                             <input type="date" id="dashboard-fecha-inicio">
                         </div>
                         <div class="campo">
-                            <label for="dashboard-fecha-fin"><i class="fas fa-calendar-alt"></i> Hasta:</label>
+                            <label for="dashboard-fecha-fin">Hasta:</label>
                             <input type="date" id="dashboard-fecha-fin">
                         </div>
                         <div class="campo">
-                            <label for="dashboard-bloque"><i class="fas fa-cube"></i> Bloque:</label>
+                            <label for="dashboard-bloque">Bloque:</label>
                             <select id="dashboard-bloque">
-                                <option value="">Todos los bloques</option>
+                                <option value="">Todos</option>
                                 <option value="1">Bloque 1</option>
                                 <option value="2">Bloque 2</option>
                                 <option value="3">Bloque 3</option>
@@ -365,94 +347,65 @@
                             </select>
                         </div>
                         <button onclick="actualizarDashboard()" class="btn-actualizar">
-                            <i class="fas fa-sync-alt"></i> Actualizar Dashboard
+                            <i class="fas fa-sync-alt"></i> Actualizar
                         </button>
                     </div>
                     
-                    <!-- KPI Cards -->
                     <div class="kpi-container">
                         <div class="kpi-card">
-                            <div class="kpi-icon" style="background: linear-gradient(135deg, #6f42c1, #6610f2);">
+                            <div class="kpi-icon" style="background: #6f42c1;">
                                 <i class="fas fa-database"></i>
                             </div>
                             <div class="kpi-content">
                                 <h3>Total Registros</h3>
                                 <div class="kpi-value" id="kpi-registros">0</div>
-                                <div class="kpi-trend" id="kpi-trend-registros">-</div>
                             </div>
                         </div>
                         <div class="kpi-card">
-                            <div class="kpi-icon" style="background: linear-gradient(135deg, #20c997, #198754);">
+                            <div class="kpi-icon" style="background: #20c997;">
                                 <i class="fas fa-star"></i>
                             </div>
                             <div class="kpi-content">
                                 <h3>Puntos Totales</h3>
                                 <div class="kpi-value" id="kpi-puntos">0</div>
-                                <div class="kpi-trend" id="kpi-trend-puntos">-</div>
                             </div>
                         </div>
                         <div class="kpi-card">
-                            <div class="kpi-icon" style="background: linear-gradient(135deg, #fd7e14, #dc3545);">
+                            <div class="kpi-icon" style="background: #fd7e14;">
                                 <i class="fas fa-exclamation-triangle"></i>
                             </div>
                             <div class="kpi-content">
-                                <h3>Problemas Detectados</h3>
+                                <h3>Problemas</h3>
                                 <div class="kpi-value" id="kpi-problemas">0</div>
-                                <div class="kpi-trend" id="kpi-trend-problemas">-</div>
                             </div>
                         </div>
                         <div class="kpi-card">
-                            <div class="kpi-icon" style="background: linear-gradient(135deg, #17a2b8, #0d6efd);">
+                            <div class="kpi-icon" style="background: #17a2b8;">
                                 <i class="fas fa-chart-line"></i>
                             </div>
                             <div class="kpi-content">
-                                <h3>Promedio por Registro</h3>
+                                <h3>Promedio</h3>
                                 <div class="kpi-value" id="kpi-promedio">0</div>
-                                <div class="kpi-trend" id="kpi-trend-promedio">-</div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Gráficos principales -->
                     <div class="graficos-container">
                         <div class="grafico-card">
                             <div class="grafico-header">
-                                <h3><i class="fas fa-chart-pie"></i> Distribución por Categorías</h3>
+                                <h3>Distribución por Categorías</h3>
                             </div>
                             <div class="grafico-body">
                                 <canvas id="dashboard-grafico-categorias"></canvas>
                             </div>
                         </div>
-                        
                         <div class="grafico-card">
                             <div class="grafico-header">
-                                <h3><i class="fas fa-chart-bar"></i> Puntos por Bloque</h3>
+                                <h3>Puntos por Bloque</h3>
                             </div>
                             <div class="grafico-body">
                                 <canvas id="dashboard-grafico-bloques"></canvas>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Últimos registros -->
-                    <div class="tabla-card">
-                        <div class="tabla-header">
-                            <h3><i class="fas fa-history"></i> Últimos Registros</h3>
-                        </div>
-                        <div class="tabla-body">
-                            <table class="tabla-estadistica" id="dashboard-tabla-ultimos">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Bloque</th>
-                                        <th>Variedad</th>
-                                        <th>Problemas</th>
-                                        <th>Puntos</th>
-                                        <th>Severidad</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dashboard-tabla-body"></tbody>
-                            </table>
                         </div>
                     </div>
                 </div>
@@ -464,16 +417,572 @@
     <div id="modalRegistros" class="modal">
         <div class="modal-contenido">
             <div class="modal-header">
-                <h2><i class="fas fa-list"></i> REGISTROS GUARDADOS</h2>
+                <h2>REGISTROS GUARDADOS</h2>
                 <button class="modal-cerrar" onclick="cerrarModal()">×</button>
             </div>
             <div class="modal-body">
-                <div id="lista-registros-container" class="lista-registros"></div>
+                <div id="lista-registros-container"></div>
             </div>
         </div>
     </div>
 
-    <!-- Script principal -->
-    <script src="app.js"></script>
+    <!-- Script con TODO el código necesario -->
+    <script>
+        // ===== CONFIGURACIÓN GLOBAL =====
+        const CONFIG = {
+            VERSION: '3.0.0',
+            STORAGE_KEYS: {
+                REGISTROS: 'registros_rosas',
+                USUARIO: 'usuario_sesion',
+                USUARIOS: 'usuarios_sistema',
+                CONTENIDO: 'contenido_sistema',
+                CONFIGURACION: 'configuracion_sistema',
+                BACKUP_PREFIX: 'backup_rosas_'
+            },
+            ALERTAS: {
+                PUNTOS_CRITICOS: 15,
+                BOTRITYS_CRITICO: 3,
+                OIDIO_CRITICO: 2,
+                ACAROS_CRITICO: 2
+            }
+        };
+
+        // ===== ENCABEZADO EXCEL =====
+        const ENCABEZADO_EXCEL = [
+            "BLOQUE", "VARIEDAD", "NRO. CAMA", "CODIGO",
+            "Botritys en el botón", "Oidio", "Clorosis", "Velloso",
+            "Acaros", "Afidos", "Trips", "Gusano",
+            "Bajeros sin descabezar", "Basales sin pinchar",
+            "Basales en punto de corte", "Botritys en tocón",
+            "Corte con yema hacia afuera", "Cuellos de ganso",
+            "Flor abierta", "Mal desyeme", "Muñones", "Orquetas",
+            "Patrones", "Piso sobre yema muerta", "Pisos muy cortos",
+            "Pisos muy delgados", "Pisos muy grandes",
+            "Presencia de palos secos", "Presencia de Yemas",
+            "Tallos cortos sin descabezar", "Tallos delgados sin descabezar",
+            "Tallos rotos", "Tallos sin encanastar", "Tallos torcidos",
+            "Tocones de corte", "Tocones",
+            "Alambre flojo y mal posicionados", "Camas secas",
+            "Charcos en caminos", "Gotera", "Laterales sucios",
+            "Mangueras de goteo colgadas", "Mangueras en mal estado",
+            "Mangueras sueltas", "Material en descomposición",
+            "Necesita alambre", "Pambil caído", "Pambil mal colocado",
+            "Presencia de hierbas", "Tachos sucios", "TOTAL GENERAL"
+        ];
+
+        // ===== CATEGORÍAS DE PROBLEMAS =====
+        const CATEGORIAS_PROBLEMAS = {
+            "ENFERMEDADES": ENCABEZADO_EXCEL.slice(4, 8),
+            "PLAGAS": ENCABEZADO_EXCEL.slice(8, 12),
+            "MANEJO CULTURAL": ENCABEZADO_EXCEL.slice(12, 35),
+            "MANTENIMIENTO": ENCABEZADO_EXCEL.slice(35, 49)
+        };
+
+        // ===== BASE DE DATOS COMPLETA =====
+        const BASE_DATOS = {
+            "1": {
+                "FREEDOM": {"1": "13", "2": "13", "3": "13", "4": "13", "5": "13", "6": "13", "7": "13", "8": "13", "9": "13", "10": "13", "11": "13", "12": "13", "13": "13", "14": "13", "15": "13", "16": "13", "17": "02", "18": "02", "19": "02", "20": "02", "21": "02", "22": "02", "23": "02", "24": "02", "25": "02", "26": "02", "27": "02", "28": "02", "29": "02", "30": "02", "31": "02", "32": "02", "33": "02", "34": "02", "35": "10", "36": "10", "37": "10", "38": "10", "39": "10", "40": "10", "41": "10", "42": "10"},
+                "MAGIC TIME": {"43": "10", "44": "10", "45": "10", "46": "10", "47": "10", "48": "10"},
+                "PALOMA": {"49": "10", "50": "10", "51": "10", "52": "10", "53": "10", "54": "10"},
+                "SHOCKING BLUE": {"55": "11", "56": "11", "57": "11", "58": "11", "59": "11", "60": "11", "61": "11", "62": "11", "63": "11", "64": "11"},
+                "GOTCHA": {"65": "11", "66": "11", "67": "11", "68": "11", "69": "11", "70": "12", "71": "12", "72": "12", "73": "12", "74": "12", "75": "12", "76": "12", "77": "12", "78": "12", "79": "12", "80": "12", "81": "12", "82": "12", "83": "12", "84": "12", "85": "12", "86": "12"}
+            },
+            "2": {
+                "PRINCESS CROWN": {"1": "03", "2": "03", "3": "03", "4": "03", "5": "03", "6": "03", "7": "03", "8": "03", "9": "03", "10": "03", "11": "03", "12": "03"},
+                "MANDARIN X-PRESSION": {"13": "03", "14": "03", "15": "03", "16": "03", "17": "03", "18": "03", "19": "03", "20": "03", "21": "03", "22": "03", "23": "03", "24": "03", "279": "04", "280": "04", "281": "04", "282": "04", "283": "04", "284": "04", "285": "04", "286": "04", "287": "04", "288": "04", "289": "04", "290": "04"},
+                "PLAYA BLANCA": {"25": "03", "26": "03", "27": "03", "28": "03", "29": "03", "30": "03", "31": "03", "32": "03", "33": "03", "34": "03", "35": "03", "36": "03", "37": "03", "38": "03", "39": "03", "40": "03", "41": "03", "42": "03", "43": "08", "44": "08", "45": "08", "46": "08", "47": "08", "48": "08"},
+                "COUNTRY BLUES": {"49": "08", "50": "08", "51": "08", "52": "08", "53": "08", "54": "08", "55": "08", "56": "08", "57": "08", "58": "08", "59": "08", "60": "08", "61": "08", "62": "08", "63": "08", "64": "08", "65": "08", "66": "08", "67": "08", "68": "08", "69": "08", "70": "08", "71": "08", "72": "08"}
+            },
+            "3": {
+                "BOULEVARD": {"1": "04"},
+                "EXPLORER": {"2": "04", "3": "04", "4": "04", "5": "04", "6": "04", "7": "04", "8": "04", "9": "04", "10": "04", "11": "04", "12": "04", "13": "04", "14": "04", "15": "04", "16": "04", "17": "04", "18": "04", "19": "04", "20": "04", "21": "04", "22": "04", "23": "04", "24": "04", "25": "04", "26": "04", "27": "04", "28": "04", "29": "04", "30": "04", "31": "05", "32": "05", "33": "05", "34": "05", "35": "05", "36": "05", "37": "05", "38": "05", "39": "05", "40": "05", "41": "05", "42": "05", "43": "05", "44": "05", "45": "05", "46": "05", "47": "05", "48": "05", "49": "05", "50": "05", "51": "05"}
+            },
+            "4": {
+                "FRUTTETO": {"1": "09", "2": "09", "3": "09", "4": "09"},
+                "BE SWEET": {"5": "09", "6": "09", "7": "09", "8": "09", "9": "09", "10": "09", "11": "09", "12": "09", "13": "09", "14": "09"}
+            },
+            "5": {
+                "VENDELA": {"1": "12", "3": "12", "5": "12", "7": "12", "9": "12", "11": "12", "13": "12", "15": "12", "17": "12", "19": "12", "21": "12", "23": "02", "25": "02", "27": "02", "29": "02", "31": "02", "33": "02", "35": "02", "37": "02", "39": "02", "41": "02", "43": "02", "45": "02", "47": "10", "49": "10", "51": "10", "53": "10", "55": "10", "57": "10", "59": "10"},
+                "HERMOSA": {"2": "12", "4": "12", "6": "12", "8": "12", "10": "12", "12": "12", "14": "12", "16": "12", "18": "12", "20": "12", "22": "12", "24": "02", "26": "02", "28": "02", "30": "02", "32": "02", "34": "02", "36": "02", "38": "02", "40": "02", "42": "02", "44": "02", "46": "02", "48": "10", "50": "10", "52": "10", "54": "10", "56": "10"}
+            }
+        };
+
+        // ===== USUARIOS POR DEFECTO =====
+        const USUARIOS_DEFAULT = {
+            admin: { password: 'admin123', rol: 'admin', nombre: 'Administrador' },
+            cristian: { password: '1234', rol: 'admin', nombre: 'Administrador Principal' },
+            supervisor: { password: 'super123', rol: 'supervisor', nombre: 'Supervisor General' },
+            operario: { password: 'oper123', rol: 'operario', nombre: 'Operario de Campo' }
+        };
+
+        // ===== VARIABLES GLOBALES =====
+        let graficos = {};
+        let usuarioActual = null;
+
+        // ===== INICIALIZACIÓN =====
+        (function() {
+            console.log('🚀 Inicializando sistema...');
+            
+            if (!localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIOS)) {
+                localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIOS, JSON.stringify(USUARIOS_DEFAULT));
+                console.log('✅ Usuarios por defecto creados');
+            }
+            
+            const hoy = new Date().toISOString().split('T')[0];
+            const fechaInput = document.getElementById('fecha');
+            if (fechaInput) fechaInput.value = hoy;
+            
+            const sesionGuardada = localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIO);
+            if (sesionGuardada) {
+                try {
+                    usuarioActual = JSON.parse(sesionGuardada);
+                    document.getElementById('login-inicial').style.display = 'none';
+                    document.getElementById('app-contenedor').style.display = 'block';
+                    document.getElementById('usuario-actual').textContent = usuarioActual.nombre;
+                    console.log('✅ Sesión restaurada');
+                } catch (e) {
+                    console.error('Error al restaurar sesión:', e);
+                }
+            }
+        })();
+
+        // ===== FUNCIÓN DE LOGIN =====
+        function verificarLoginInicial() {
+            const usuario = document.getElementById('login-usuario').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            
+            if (!usuario || !password) {
+                mostrarNotificacion('❌ Complete todos los campos', 'error');
+                return;
+            }
+            
+            const usuarios = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIOS)) || {};
+            
+            if (usuarios[usuario] && usuarios[usuario].password === password) {
+                usuarioActual = {
+                    usuario: usuario,
+                    rol: usuarios[usuario].rol,
+                    nombre: usuarios[usuario].nombre,
+                    loginTime: new Date().getTime()
+                };
+                
+                localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIO, JSON.stringify(usuarioActual));
+                
+                document.getElementById('login-inicial').style.display = 'none';
+                document.getElementById('app-contenedor').style.display = 'block';
+                document.getElementById('usuario-actual').textContent = usuarios[usuario].nombre;
+                
+                mostrarNotificacion(`✅ Bienvenido ${usuarios[usuario].nombre}`, 'success');
+                crearListasProblemas();
+                actualizarTotalRegistros();
+            } else {
+                mostrarNotificacion('❌ Usuario o contraseña incorrectos', 'error');
+            }
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem(CONFIG.STORAGE_KEYS.USUARIO);
+            usuarioActual = null;
+            document.getElementById('app-contenedor').style.display = 'none';
+            document.getElementById('login-inicial').style.display = 'flex';
+            mostrarNotificacion('👋 Sesión cerrada', 'info');
+        }
+
+        function mostrarNotificacion(mensaje, tipo = 'info') {
+            const container = document.getElementById('notificaciones');
+            const id = 'notif-' + Date.now();
+            
+            const notificacion = document.createElement('div');
+            notificacion.className = `notificacion ${tipo}`;
+            notificacion.id = id;
+            
+            const iconos = {
+                error: 'fa-times-circle',
+                warning: 'fa-exclamation-triangle',
+                success: 'fa-check-circle',
+                info: 'fa-info-circle'
+            };
+            
+            notificacion.innerHTML = `
+                <i class="fas ${iconos[tipo]}"></i>
+                <span>${mensaje}</span>
+            `;
+            
+            container.appendChild(notificacion);
+            setTimeout(() => notificacion.remove(), 3000);
+        }
+
+        function crearListasProblemas() {
+            const contenedores = ['enfermedades-lista', 'plagas-lista', 'manejo-lista', 'mantenimiento-lista'];
+            const categorias = Object.values(CATEGORIAS_PROBLEMAS);
+            
+            contenedores.forEach((contId, idx) => {
+                const contenedor = document.getElementById(contId);
+                if (!contenedor) return;
+                
+                contenedor.innerHTML = '';
+                categorias[idx].forEach(problema => {
+                    const id = problema.toLowerCase().replace(/ /g, '_');
+                    const div = document.createElement('div');
+                    div.className = 'item';
+                    div.innerHTML = `
+                        <div style="display: flex; align-items: center; flex: 1;">
+                            <input type="checkbox" id="chk_${id}" onchange="toggleSeveridad('${id}')">
+                            <label for="chk_${id}">${problema}</label>
+                        </div>
+                        <select id="sel_${id}" style="display: none; width: 70px;" onchange="actualizarResumen()">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    `;
+                    contenedor.appendChild(div);
+                });
+            });
+        }
+
+        function toggleSeveridad(id) {
+            const checkbox = document.getElementById(`chk_${id}`);
+            const select = document.getElementById(`sel_${id}`);
+            
+            if (checkbox.checked) {
+                select.style.display = 'inline-block';
+                select.value = '1';
+            } else {
+                select.style.display = 'none';
+                select.value = '0';
+            }
+            actualizarResumen();
+        }
+
+        function actualizarResumen() {
+            let puntosEstimados = 0;
+            let totalProblemas = 0;
+            
+            for (let i = 4; i < ENCABEZADO_EXCEL.length - 1; i++) {
+                const problema = ENCABEZADO_EXCEL[i];
+                const id = problema.toLowerCase().replace(/ /g, '_');
+                const checkbox = document.getElementById(`chk_${id}`);
+                const select = document.getElementById(`sel_${id}`);
+                
+                if (checkbox && checkbox.checked) {
+                    totalProblemas++;
+                    puntosEstimados += parseInt(select.value) || 1;
+                }
+            }
+            
+            document.getElementById('puntos-totales').textContent = puntosEstimados;
+            document.getElementById('total-problemas').textContent = totalProblemas;
+        }
+
+        function cargarVariedades() {
+            const bloque = document.getElementById('bloque').value;
+            const selectVariedad = document.getElementById('variedad');
+            const selectCama = document.getElementById('nro_cama');
+            
+            selectVariedad.innerHTML = '<option value="">Seleccione variedad</option>';
+            selectCama.innerHTML = '<option value="">Primero seleccione variedad</option>';
+            selectCama.disabled = true;
+            
+            if (!bloque) {
+                selectVariedad.disabled = true;
+                return;
+            }
+            
+            selectVariedad.disabled = false;
+            const variedades = BASE_DATOS[bloque] ? Object.keys(BASE_DATOS[bloque]) : [];
+            
+            variedades.forEach(variedad => {
+                const option = document.createElement('option');
+                option.value = variedad;
+                option.textContent = variedad;
+                selectVariedad.appendChild(option);
+            });
+        }
+
+        function cargarCamas() {
+            const bloque = document.getElementById('bloque').value;
+            const variedad = document.getElementById('variedad').value;
+            const selectCama = document.getElementById('nro_cama');
+            
+            selectCama.innerHTML = '<option value="">Seleccione cama</option>';
+            
+            if (!bloque || !variedad) {
+                selectCama.disabled = true;
+                return;
+            }
+            
+            selectCama.disabled = false;
+            const camas = BASE_DATOS[bloque] && BASE_DATOS[bloque][variedad] ? 
+                Object.keys(BASE_DATOS[bloque][variedad]) : [];
+            
+            camas.sort((a, b) => parseInt(a) - parseInt(b)).forEach(cama => {
+                const option = document.createElement('option');
+                option.value = cama;
+                option.textContent = `Cama ${cama}`;
+                selectCama.appendChild(option);
+            });
+        }
+
+        function cargarCodigo() {
+            const bloque = document.getElementById('bloque').value;
+            const variedad = document.getElementById('variedad').value;
+            const cama = document.getElementById('nro_cama').value;
+            const inputCodigo = document.getElementById('codigo');
+            
+            if (bloque && variedad && cama) {
+                const codigo = BASE_DATOS[bloque] && BASE_DATOS[bloque][variedad] && 
+                    BASE_DATOS[bloque][variedad][cama] || '';
+                inputCodigo.value = codigo;
+            } else {
+                inputCodigo.value = '';
+            }
+        }
+
+        function guardarRegistro() {
+            const fecha = document.getElementById('fecha').value;
+            const bloque = document.getElementById('bloque').value;
+            const variedad = document.getElementById('variedad').value;
+            const cama = document.getElementById('nro_cama').value;
+            const codigo = document.getElementById('codigo').value;
+            
+            if (!bloque || !variedad || !cama) {
+                mostrarNotificacion('❌ Seleccione Bloque, Variedad y Cama', 'error');
+                return;
+            }
+            
+            const registro = {
+                fecha: fecha,
+                bloque: bloque,
+                variedad: variedad,
+                nro_cama: cama,
+                codigo: codigo,
+                timestamp: new Date().getTime(),
+                usuario: usuarioActual ? usuarioActual.nombre : 'Visitante'
+            };
+            
+            let totalGeneral = 0;
+            
+            for (let i = 4; i < ENCABEZADO_EXCEL.length - 1; i++) {
+                const problema = ENCABEZADO_EXCEL[i];
+                const id = problema.toLowerCase().replace(/ /g, '_');
+                const checkbox = document.getElementById(`chk_${id}`);
+                const select = document.getElementById(`sel_${id}`);
+                
+                let valor = 0;
+                if (checkbox && checkbox.checked) {
+                    valor = parseInt(select.value) || 1;
+                }
+                
+                registro[problema] = valor;
+                totalGeneral += valor;
+            }
+            
+            registro["TOTAL GENERAL"] = totalGeneral;
+            
+            let registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
+            registros.push(registro);
+            localStorage.setItem(CONFIG.STORAGE_KEYS.REGISTROS, JSON.stringify(registros));
+            
+            actualizarTotalRegistros();
+            mostrarNotificacion(`✅ Registro guardado: ${totalGeneral} puntos`, 'success');
+            limpiarProblemas();
+        }
+
+        function limpiarProblemas() {
+            for (let i = 4; i < ENCABEZADO_EXCEL.length - 1; i++) {
+                const problema = ENCABEZADO_EXCEL[i];
+                const id = problema.toLowerCase().replace(/ /g, '_');
+                const checkbox = document.getElementById(`chk_${id}`);
+                const select = document.getElementById(`sel_${id}`);
+                
+                if (checkbox) checkbox.checked = false;
+                if (select) {
+                    select.style.display = 'none';
+                    select.value = '0';
+                }
+            }
+            actualizarResumen();
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('bloque').selectedIndex = 0;
+            document.getElementById('variedad').innerHTML = '<option value="">Primero seleccione bloque</option>';
+            document.getElementById('variedad').disabled = true;
+            document.getElementById('nro_cama').innerHTML = '<option value="">Primero seleccione variedad</option>';
+            document.getElementById('nro_cama').disabled = true;
+            document.getElementById('codigo').value = '';
+            limpiarProblemas();
+        }
+
+        function exportarExcelPerfecto() {
+            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
+            
+            if (registros.length === 0) {
+                mostrarNotificacion('📭 No hay registros', 'warning');
+                return;
+            }
+            
+            let csv = ENCABEZADO_EXCEL.join(';') + '\\n';
+            
+            registros.forEach(reg => {
+                let fila = ENCABEZADO_EXCEL.map(col => {
+                    if (col === 'BLOQUE') return reg.bloque || '';
+                    if (col === 'VARIEDAD') return reg.variedad || '';
+                    if (col === 'NRO. CAMA') return reg.nro_cama || '';
+                    if (col === 'CODIGO') return reg.codigo || '';
+                    return reg[col] || 0;
+                });
+                csv += fila.join(';') + '\\n';
+            });
+            
+            const blob = new Blob(['\\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `MONITOREO_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            
+            mostrarNotificacion(`✅ Exportados ${registros.length} registros`, 'success');
+        }
+
+        function actualizarTotalRegistros() {
+            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
+            document.getElementById('total-registros-header').textContent = registros.length;
+            
+            if (registros.length > 0) {
+                const ultimo = registros[registros.length - 1];
+                const fecha = new Date(ultimo.timestamp);
+                document.getElementById('ultima-sincronizacion').textContent = 
+                    fecha.toLocaleTimeString();
+                document.getElementById('ultimo-registro').textContent = 
+                    `${ultimo.variedad} (Cama ${ultimo.nro_cama})`;
+            }
+        }
+
+        function verRegistrosModal() {
+            document.getElementById('modalRegistros').style.display = 'flex';
+            const container = document.getElementById('lista-registros-container');
+            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
+            
+            if (registros.length === 0) {
+                container.innerHTML = '<div class="sin-registros">📭 No hay registros</div>';
+                return;
+            }
+            
+            registros.sort((a, b) => b.timestamp - a.timestamp);
+            
+            container.innerHTML = registros.map(reg => `
+                <div class="registro-item">
+                    <div>
+                        <div>${new Date(reg.timestamp).toLocaleString()}</div>
+                        <div>Bloque ${reg.bloque} - ${reg.variedad} - Cama ${reg.nro_cama}</div>
+                        <div>Total: ${reg["TOTAL GENERAL"]} puntos</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalRegistros').style.display = 'none';
+        }
+
+        function toggleModoOscuro() {
+            document.body.classList.toggle('modo-oscuro');
+            const btn = document.getElementById('toggle-modo');
+            btn.innerHTML = document.body.classList.contains('modo-oscuro') ? 
+                '<i class="fas fa-sun"></i> Modo Claro' : 
+                '<i class="fas fa-moon"></i> Modo Oscuro';
+        }
+
+        function abrirPanelAdmin() {
+            if (!usuarioActual || usuarioActual.rol !== 'admin') {
+                mostrarNotificacion('❌ Solo administradores', 'error');
+                return;
+            }
+            document.getElementById('admin-panel').style.display = 'flex';
+        }
+
+        function cerrarPanelAdmin() {
+            document.getElementById('admin-panel').style.display = 'none';
+        }
+
+        function cambiarAdminTab(tabId) {
+            document.querySelectorAll('.admin-seccion').forEach(s => s.classList.remove('activa'));
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('activa'));
+            document.querySelector(`[onclick="cambiarAdminTab('${tabId}')"]`).classList.add('activa');
+            document.getElementById(`admin-${tabId}`).classList.add('activa');
+        }
+
+        function agregarUsuario() {
+            const usuario = document.getElementById('nuevo-usuario').value;
+            const password = document.getElementById('nueva-password').value;
+            const rol = document.getElementById('nuevo-rol').value;
+            const nombre = document.getElementById('nuevo-nombre').value;
+            
+            if (!usuario || !password || !nombre) {
+                mostrarNotificacion('❌ Complete todos los campos', 'error');
+                return;
+            }
+            
+            const usuarios = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIOS));
+            usuarios[usuario] = { password, rol, nombre };
+            localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIOS, JSON.stringify(usuarios));
+            
+            mostrarNotificacion('✅ Usuario agregado', 'success');
+            cargarUsuariosEnPanel();
+        }
+
+        function cargarUsuariosEnPanel() {
+            const usuarios = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIOS));
+            const lista = document.getElementById('lista-usuarios');
+            if (!lista) return;
+            
+            lista.innerHTML = Object.keys(usuarios).map(username => `
+                <div class="usuario-item">
+                    <div>
+                        <strong>${usuarios[username].nombre}</strong> (${username})
+                        <br><small>Rol: ${usuarios[username].rol}</small>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function guardarConfiguracion() {
+            mostrarNotificacion('✅ Configuración guardada', 'success');
+        }
+
+        function realizarBackup() {
+            mostrarNotificacion('📦 Backup realizado', 'success');
+        }
+
+        function enviarReporteWhatsApp() {
+            mostrarNotificacion('📱 Reporte enviado', 'success');
+        }
+
+        function eliminarTodosRegistros() {
+            if (confirm('¿Eliminar TODOS los registros?')) {
+                localStorage.removeItem(CONFIG.STORAGE_KEYS.REGISTROS);
+                actualizarTotalRegistros();
+                mostrarNotificacion('✅ Registros eliminados', 'success');
+            }
+        }
+
+        function cambiarPestana(pestanaId) {
+            document.querySelectorAll('.contenido-pestana').forEach(p => p.classList.remove('activa'));
+            document.querySelectorAll('.pestana').forEach(p => p.classList.remove('activa'));
+            document.querySelector(`[onclick="cambiarPestana('${pestanaId}')"]`).classList.add('activa');
+            document.getElementById(`pestana-${pestanaId}`).classList.add('activa');
+            
+            if (pestanaId === 'dashboard') {
+                setTimeout(actualizarDashboard, 100);
+            }
+        }
+
+        function actualizarDashboard() {
+            document.getElementById('kpi-registros').textContent = 
+                JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]').length;
+        }
+    </script>
 </body>
 </html>
