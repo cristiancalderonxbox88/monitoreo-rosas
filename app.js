@@ -113,7 +113,7 @@ const BASE_DATOS = {
 const USUARIOS_DEFAULT = {
     admin: { password: 'admin123', rol: 'admin', nombre: 'Administrador secundario' },
     cristian: { password: '1234', rol: 'admin', nombre: 'Administrador Principal' },
-    supervisor: { password: 'super123', rol: 'supervisor', nombre: 'Supervisor General' },
+    supervisor: { password: 'super123', rol: 'admin', nombre: 'Supervisor General' },
     operario: { password: 'oper123', rol: 'operario', nombre: 'Operario de Campo' }
 };
 
@@ -1460,4 +1460,5 @@ document.head.insertAdjacentHTML('beforeend', `
 </style>
 
 `);
+
 
