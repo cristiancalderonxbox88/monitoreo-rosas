@@ -6,7 +6,7 @@
     <title>Sistema Monitoreo Rosas 🌹</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#335ed6">
+    <meta name="theme-color" content="#5ed633">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
@@ -575,4 +575,588 @@
         function cerrarSesion() {
             localStorage.removeItem(CONFIG.STORAGE_KEYS.USUARIO);
             usuarioActual = null;
-            document.getElementById('app-contenedor').style.display = 'none
+            document.getElementById('app-contenedor').style.display = 'none';
+            document.getElementById('login-inicial').style.display = 'flex';
+            mostrarNotificacion('👋 Sesión cerrada', 'info');
+        }
+
+        function mostrarNotificacion(mensaje, tipo = 'info') {
+            const container = document.getElementById('notificaciones');
+            const id = 'notif-' + Date.now();
+            
+            const notificacion = document.createElement('div');
+            notificacion.className = `notificacion ${tipo}`;
+            notificacion.id = id;
+            
+            const iconos = {
+                error: 'fa-times-circle',
+                warning: 'fa-exclamation-triangle',
+                success: 'fa-check-circle',
+                info: 'fa-info-circle'
+            };
+            
+            notificacion.innerHTML = `
+                <i class="fas ${iconos[tipo]}"></i>
+                <span>${mensaje}</span>
+                <button onclick="cerrarNotificacion('${id}')" style="margin-left: auto; background: none; border: none; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(notificacion);
+            setTimeout(() => cerrarNotificacion(id), 3000);
+        }
+
+        function cerrarNotificacion(id) {
+            const notificacion = document.getElementById(id);
+            if (notificacion) {
+                notificacion.style.transform = 'translateX(100%)';
+                notificacion.style.opacity = '0';
+                setTimeout(() => notificacion.remove(), 300);
+            }
+        }
+
+        function crearListasProblemas() {
+            const contenedores = ['enfermedades-lista', 'plagas-lista', 'manejo-lista', 'mantenimiento-lista'];
+            const categorias = Object.values(CATEGORIAS_PROBLEMAS);
+            
+            contenedores.forEach((contId, idx) => {
+                const contenedor = document.getElementById(contId);
+                if (!contenedor) return;
+                
+                contenedor.innerHTML = '';
+                categorias[idx].forEach(problema => {
+                    const id = problema.toLowerCase().replace(/ /g, '_');
+                    const div = document.createElement('div');
+                    div.className = 'item';
+                    div.innerHTML = `
+                        <div style="display: flex; align-items: center; flex: 1;">
+                            <input type="checkbox" id="chk_${id}" onchange="toggleSeveridad('${id}')">
+                            <label for="chk_${id}">${problema}</label>
+                        </div>
+                        <select id="sel_${id}" style="display: none; width: 70px;" onchange="actualizarResumen()">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    `;
+                    contenedor.appendChild(div);
+                });
+            });
+        }
+
+        function toggleSeveridad(id) {
+            const checkbox = document.getElementById(`chk_${id}`);
+            const select = document.getElementById(`sel_${id}`);
+            
+            if (checkbox.checked) {
+                select.style.display = 'inline-block';
+                select.value = '1';
+            } else {
+                select.style.display = 'none';
+                select.value = '0';
+            }
+            actualizarResumen();
+        }
+
+        function actualizarResumen() {
+            const bloque = document.getElementById('bloque').value;
+            const variedad = document.getElementById('variedad').value;
+            const cama = document.getElementById('nro_cama').value;
+            
+            let seleccion = "No seleccionado";
+            if (bloque && variedad && cama) {
+                seleccion = `Bloque ${bloque} - ${variedad} - Cama ${cama}`;
+            }
+            document.getElementById('resumen-seleccion').textContent = seleccion;
+            
+            let puntosEstimados = 0;
+            let totalProblemas = 0;
+            
+            for (let i = 4; i < ENCABEZADO_EXCEL.length - 1; i++) {
+                const problema = ENCABEZADO_EXCEL[i];
+                const id = problema.toLowerCase().replace(/ /g, '_');
+                const checkbox = document.getElementById(`chk_${id}`);
+                const select = document.getElementById(`sel_${id}`);
+                
+                if (checkbox && checkbox.checked) {
+                    totalProblemas++;
+                    puntosEstimados += parseInt(select.value) || 1;
+                }
+            }
+            
+            document.getElementById('puntos-totales').textContent = puntosEstimados;
+            document.getElementById('total-problemas').textContent = totalProblemas;
+        }
+
+        function cargarVariedades() {
+            const bloque = document.getElementById('bloque').value;
+            const selectVariedad = document.getElementById('variedad');
+            const selectCama = document.getElementById('nro_cama');
+            const inputCodigo = document.getElementById('codigo');
+            
+            selectVariedad.innerHTML = '<option value="">Seleccione variedad</option>';
+            selectCama.innerHTML = '<option value="">Primero seleccione variedad</option>';
+            selectCama.disabled = true;
+            inputCodigo.value = '';
+            
+            if (!bloque) {
+                selectVariedad.disabled = true;
+                return;
+            }
+            
+            selectVariedad.disabled = false;
+            const variedades = BASE_DATOS[bloque] ? Object.keys(BASE_DATOS[bloque]) : [];
+            
+            variedades.forEach(variedad => {
+                const option = document.createElement('option');
+                option.value = variedad;
+                option.textContent = variedad;
+                selectVariedad.appendChild(option);
+            });
+        }
+
+        function cargarCamas() {
+            const bloque = document.getElementById('bloque').value;
+            const variedad = document.getElementById('variedad').value;
+            const selectCama = document.getElementById('nro_cama');
+            const inputCodigo = document.getElementById('codigo');
+            
+            selectCama.innerHTML = '<option value="">Seleccione cama</option>';
+            inputCodigo.value = '';
+            
+            if (!bloque || !variedad) {
+                selectCama.disabled = true;
+                return;
+            }
+            
+            selectCama.disabled = false;
+            const camas = BASE_DATOS[bloque] && BASE_DATOS[bloque][variedad] ? 
+                Object.keys(BASE_DATOS[bloque][variedad]) : [];
+            
+            camas.sort((a, b) => parseInt(a) - parseInt(b)).forEach(cama => {
+                const option = document.createElement('option');
+                option.value = cama;
+                option.textContent = `Cama ${cama}`;
+                selectCama.appendChild(option);
+            });
+        }
+
+        function cargarCodigo() {
+            const bloque = document.getElementById('bloque').value;
+            const variedad = document.getElementById('variedad').value;
+            const cama = document.getElementById('nro_cama').value;
+            const inputCodigo = document.getElementById('codigo');
+            
+            if (bloque && variedad && cama) {
+                const codigo = BASE_DATOS[bloque] && BASE_DATOS[bloque][variedad] && 
+                    BASE_DATOS[bloque][variedad][cama] || '';
+                inputCodigo.value = codigo;
+            } else {
+                inputCodigo.value = '';
+            }
+        }
+
+        function guardarRegistro() {
+            const fecha = document.getElementById('fecha').value;
+            const bloque = document.getElementById('bloque').value;
+            const variedad = document.getElementById('variedad').value;
+            const cama = document.getElementById('nro_cama').value;
+            const codigo = document.getElementById('codigo').value;
+            
+            if (!bloque || !variedad || !cama) {
+                mostrarNotificacion('❌ Seleccione Bloque, Variedad y Cama', 'error');
+                return;
+            }
+            
+            const registro = {
+                fecha: fecha,
+                bloque: bloque,
+                variedad: variedad,
+                nro_cama: cama,
+                codigo: codigo,
+                timestamp: new Date().getTime(),
+                usuario: usuarioActual ? usuarioActual.nombre : 'Visitante'
+            };
+            
+            let totalGeneral = 0;
+            
+            for (let i = 4; i < ENCABEZADO_EXCEL.length - 1; i++) {
+                const problema = ENCABEZADO_EXCEL[i];
+                const id = problema.toLowerCase().replace(/ /g, '_');
+                const checkbox = document.getElementById(`chk_${id}`);
+                const select = document.getElementById(`sel_${id}`);
+                
+                let valor = 0;
+                if (checkbox && checkbox.checked) {
+                    valor = parseInt(select.value) || 1;
+                }
+                
+                registro[problema] = valor;
+                totalGeneral += valor;
+            }
+            
+            registro["TOTAL GENERAL"] = totalGeneral;
+            
+            let registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
+            registros.push(registro);
+            localStorage.setItem(CONFIG.STORAGE_KEYS.REGISTROS, JSON.stringify(registros));
+            
+            verificarAlertas(registro);
+            
+            actualizarTotalRegistros();
+            mostrarNotificacion(`✅ Registro guardado: ${totalGeneral} puntos`, 'success');
+            limpiarProblemas();
+        }
+
+        function limpiarProblemas() {
+            for (let i = 4; i < ENCABEZADO_EXCEL.length - 1; i++) {
+                const problema = ENCABEZADO_EXCEL[i];
+                const id = problema.toLowerCase().replace(/ /g, '_');
+                const checkbox = document.getElementById(`chk_${id}`);
+                const select = document.getElementById(`sel_${id}`);
+                
+                if (checkbox) checkbox.checked = false;
+                if (select) {
+                    select.style.display = 'none';
+                    select.value = '0';
+                }
+            }
+            actualizarResumen();
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('bloque').selectedIndex = 0;
+            document.getElementById('variedad').innerHTML = '<option value="">Primero seleccione bloque</option>';
+            document.getElementById('variedad').disabled = true;
+            document.getElementById('nro_cama').innerHTML = '<option value="">Primero seleccione variedad</option>';
+            document.getElementById('nro_cama').disabled = true;
+            document.getElementById('codigo').value = '';
+            limpiarProblemas();
+            mostrarNotificacion('✅ Formulario limpiado', 'info');
+        }
+
+        function exportarExcelPerfecto() {
+            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
+            
+            if (registros.length === 0) {
+                mostrarNotificacion('📭 No hay registros', 'warning');
+                return;
+            }
+            
+            let csv = ENCABEZADO_EXCEL.join(';') + '\n';
+            
+            registros.forEach(reg => {
+                let fila = ENCABEZADO_EXCEL.map(col => {
+                    if (col === 'BLOQUE') return reg.bloque || '';
+                    if (col === 'VARIEDAD') return reg.variedad || '';
+                    if (col === 'NRO. CAMA') return reg.nro_cama || '';
+                    if (col === 'CODIGO') return reg.codigo || '';
+                    return reg[col] || 0;
+                });
+                csv += fila.join(';') + '\n';
+            });
+            
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `MONITOREO_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            
+            mostrarNotificacion(`✅ Exportados ${registros.length} registros`, 'success');
+        }
+
+        function verificarAlertas(registro) {
+            if (registro["TOTAL GENERAL"] > CONFIG.ALERTAS.PUNTOS_CRITICOS) {
+                mostrarNotificacion('⚠️ Puntuación crítica detectada', 'warning');
+            }
+        }
+
+        function actualizarTotalRegistros() {
+            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
+            document.getElementById('total-registros-header').textContent = registros.length;
+            
+            if (registros.length > 0) {
+                const ultimo = registros[registros.length - 1];
+                const fecha = new Date(ultimo.timestamp);
+                document.getElementById('ultima-sincronizacion').textContent = 
+                    fecha.toLocaleTimeString();
+                document.getElementById('ultimo-registro').textContent = 
+                    `${ultimo.variedad} (Cama ${ultimo.nro_cama})`;
+            }
+        }
+
+        function verRegistrosModal() {
+            document.getElementById('modalRegistros').style.display = 'flex';
+            const container = document.getElementById('lista-registros-container');
+            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
+            
+            if (registros.length === 0) {
+                container.innerHTML = '<div class="sin-registros">📭 No hay registros guardados</div>';
+                return;
+            }
+            
+            registros.sort((a, b) => b.timestamp - a.timestamp);
+            
+            container.innerHTML = registros.map(reg => `
+                <div class="registro-item">
+                    <div>
+                        <div><strong>${new Date(reg.timestamp).toLocaleString()}</strong></div>
+                        <div>Bloque ${reg.bloque} - ${reg.variedad} - Cama ${reg.nro_cama}</div>
+                        <div>Total: ${reg["TOTAL GENERAL"]} puntos | Usuario: ${reg.usuario || 'Desconocido'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalRegistros').style.display = 'none';
+        }
+
+        function eliminarTodosRegistros() {
+            if (confirm('⚠️ ¿Eliminar TODOS los registros?')) {
+                localStorage.removeItem(CONFIG.STORAGE_KEYS.REGISTROS);
+                actualizarTotalRegistros();
+                mostrarNotificacion('✅ Todos los registros eliminados', 'success');
+                
+                if (document.getElementById('modalRegistros').style.display === 'flex') {
+                    cerrarModal();
+                }
+            }
+        }
+
+        function toggleModoOscuro() {
+            document.body.classList.toggle('modo-oscuro');
+            const btn = document.getElementById('toggle-modo');
+            btn.innerHTML = document.body.classList.contains('modo-oscuro') ? 
+                '<i class="fas fa-sun"></i> Modo Claro' : 
+                '<i class="fas fa-moon"></i> Modo Oscuro';
+        }
+
+        function abrirPanelAdmin() {
+            if (!usuarioActual || (usuarioActual.rol !== 'admin' && usuarioActual.rol !== 'superadmin')) {
+                mostrarNotificacion('❌ Solo administradores', 'error');
+                return;
+            }
+            document.getElementById('admin-panel').style.display = 'flex';
+            cargarUsuariosEnPanel();
+            cargarContenidoEnPanel();
+            cargarConfiguracionEnPanel();
+        }
+
+        function cerrarPanelAdmin() {
+            document.getElementById('admin-panel').style.display = 'none';
+        }
+
+        function cambiarAdminTab(tabId) {
+            document.querySelectorAll('.admin-seccion').forEach(s => s.classList.remove('activa'));
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('activa'));
+            document.querySelector(`[onclick="cambiarAdminTab('${tabId}')"]`).classList.add('activa');
+            document.getElementById(`admin-${tabId}`).classList.add('activa');
+        }
+
+        // ===== FUNCIONES DEL PANEL ADMIN (SOLO LECTURA PARA USUARIOS) =====
+        function cargarUsuariosEnPanel() {
+            const lista = document.getElementById('lista-usuarios');
+            if (!lista) return;
+            
+            // Mostrar usuarios FIJOS del código
+            lista.innerHTML = Object.keys(USUARIOS_FIJOS).map(username => {
+                const usuario = USUARIOS_FIJOS[username];
+                const esActual = usuarioActual && usuarioActual.usuario === username;
+                return `
+                    <div class="usuario-item" style="${esActual ? 'border-left: 4px solid #4CAF50;' : ''} background: #f8f9fa; margin-bottom: 10px; padding: 15px; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="font-size: 16px;">${usuario.nombre}</strong>
+                                ${esActual ? '<span style="background: #4CAF50; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 10px;">Sesión actual</span>' : ''}
+                                <div style="margin-top: 5px;">
+                                    <span style="background: #e9ecef; padding: 3px 10px; border-radius: 15px; font-size: 12px;">${username}</span>
+                                    <span style="background: ${usuario.rol === 'superadmin' ? '#9c27b0' : usuario.rol === 'admin' ? '#2196F3' : usuario.rol === 'supervisor' ? '#FF9800' : '#607D8B'}; color: white; padding: 3px 10px; border-radius: 15px; font-size: 12px; margin-left: 5px;">${usuario.rol}</span>
+                                </div>
+                            </div>
+                            <div style="color: #666; font-size: 12px; font-style: italic;">
+                                <i class="fas fa-lock"></i> Usuario fijo
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Ocultar el formulario de agregar usuarios
+            const formAgregar = document.querySelector('#admin-usuarios .admin-formulario');
+            if (formAgregar) formAgregar.style.display = 'none';
+        }
+
+        function agregarUsuario() {
+            mostrarNotificacion('❌ Los usuarios son fijos y no pueden modificarse desde el panel', 'warning');
+        }
+
+        function cargarContenidoEnPanel() {
+            const contenido = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CONTENIDO) || '[]');
+            const lista = document.getElementById('lista-contenido');
+            
+            if (!lista) return;
+            
+            if (contenido.length === 0) {
+                lista.innerHTML = '<div class="sin-registros">📭 No hay contenido guardado</div>';
+                return;
+            }
+            
+            lista.innerHTML = contenido.map((item, index) => `
+                <div class="contenido-item" style="background: #f8f9fa; padding: 15px; margin-bottom: 10px; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>
+                            <strong>${item.titulo}</strong> <span style="background: #e9ecef; padding: 2px 8px; border-radius: 12px; font-size: 11px;">${item.tipo}</span>
+                            <p style="margin-top: 5px; color: #666;">${item.descripcion}</p>
+                            <small>Creado: ${new Date(item.fecha).toLocaleString()} por ${item.autor}</small>
+                        </div>
+                        <div>
+                            <button class="btn-eliminar" onclick="eliminarContenido(${index})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function agregarContenido() {
+            const titulo = document.getElementById('titulo-contenido').value;
+            const tipo = document.getElementById('tipo-contenido').value;
+            const descripcion = document.getElementById('descripcion-contenido').value;
+            
+            if (!titulo || !descripcion) {
+                mostrarNotificacion('❌ Complete todos los campos', 'error');
+                return;
+            }
+            
+            const contenido = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CONTENIDO) || '[]');
+            
+            contenido.push({
+                titulo,
+                tipo,
+                descripcion,
+                fecha: new Date().toISOString(),
+                autor: usuarioActual ? usuarioActual.nombre : 'Sistema'
+            });
+            
+            localStorage.setItem(CONFIG.STORAGE_KEYS.CONTENIDO, JSON.stringify(contenido));
+            
+            document.getElementById('titulo-contenido').value = '';
+            document.getElementById('descripcion-contenido').value = '';
+            
+            cargarContenidoEnPanel();
+            mostrarNotificacion('✅ Contenido agregado', 'success');
+        }
+
+        function eliminarContenido(index) {
+            if (!confirm('¿Eliminar este contenido?')) return;
+            
+            const contenido = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CONTENIDO) || '[]');
+            contenido.splice(index, 1);
+            localStorage.setItem(CONFIG.STORAGE_KEYS.CONTENIDO, JSON.stringify(contenido));
+            
+            cargarContenidoEnPanel();
+            mostrarNotificacion('✅ Contenido eliminado', 'success');
+        }
+
+        function cargarConfiguracionEnPanel() {
+            const config = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CONFIGURACION) || '{}');
+            
+            document.getElementById('auto-backup').checked = config.autoBackup || false;
+            document.getElementById('notificaciones-email').checked = config.notificacionesEmail || false;
+        }
+
+        function guardarConfiguracion() {
+            const config = {
+                autoBackup: document.getElementById('auto-backup').checked,
+                notificacionesEmail: document.getElementById('notificaciones-email').checked,
+                modoOscuro: document.body.classList.contains('modo-oscuro')
+            };
+            
+            localStorage.setItem(CONFIG.STORAGE_KEYS.CONFIGURACION, JSON.stringify(config));
+            mostrarNotificacion('✅ Configuración guardada', 'success');
+        }
+
+        function realizarBackup() {
+            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
+            
+            if (registros.length === 0) {
+                mostrarNotificacion('📭 No hay registros para respaldar', 'warning');
+                return;
+            }
+            
+            const blob = new Blob([JSON.stringify(registros, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            
+            mostrarNotificacion(`✅ Backup de ${registros.length} registros`, 'success');
+        }
+
+        function enviarReporteWhatsApp() {
+            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
+            const hoy = new Date().toISOString().split('T')[0];
+            const registrosHoy = registros.filter(r => r.fecha === hoy);
+            
+            const puntosTotales = registrosHoy.reduce((sum, r) => sum + (r["TOTAL GENERAL"] || 0), 0);
+            
+            const texto = `📊 REPORTE ROSAS
+Fecha: ${hoy}
+Registros: ${registrosHoy.length}
+Puntos totales: ${puntosTotales}`;
+            
+            const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+        }
+
+        function cambiarPestana(pestanaId) {
+            document.querySelectorAll('.contenido-pestana').forEach(p => p.classList.remove('activa'));
+            document.querySelectorAll('.pestana').forEach(p => p.classList.remove('activa'));
+            document.querySelector(`[onclick="cambiarPestana('${pestanaId}')"]`).classList.add('activa');
+            document.getElementById(`pestana-${pestanaId}`).classList.add('activa');
+            
+            if (pestanaId === 'dashboard') {
+                setTimeout(actualizarDashboard, 100);
+            }
+        }
+
+        function actualizarDashboard() {
+            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
+            
+            document.getElementById('kpi-registros').textContent = registros.length;
+            
+            const puntosTotales = registros.reduce((sum, r) => sum + (r["TOTAL GENERAL"] || 0), 0);
+            document.getElementById('kpi-puntos').textContent = puntosTotales;
+            
+            const problemasUnicos = new Set();
+            registros.forEach(r => {
+                Object.keys(r).forEach(k => {
+                    if (ENCABEZADO_EXCEL.includes(k) && r[k] > 0) {
+                        problemasUnicos.add(k);
+                    }
+                });
+            });
+            document.getElementById('kpi-problemas').textContent = problemasUnicos.size;
+            
+            const promedio = registros.length > 0 ? (puntosTotales / registros.length).toFixed(1) : 0;
+            document.getElementById('kpi-promedio').textContent = promedio;
+        }
+
+        // Animación shake
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+            </style>
+        `);
+    </script>
+</body>
+</html>
