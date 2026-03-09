@@ -520,13 +520,13 @@
         let usuarioActual = null;
 
         // ===== INICIALIZACIÓN =====
-        (function() {
+       /*(function() {
             console.log('🚀 Inicializando sistema...');
             
             if (!localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIOS)) {
                 localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIOS, JSON.stringify(USUARIOS_DEFAULT));
                 console.log('✅ Usuarios por defecto creados');
-            }
+            }*/
             
             const hoy = new Date().toISOString().split('T')[0];
             const fechaInput = document.getElementById('fecha');
@@ -547,39 +547,46 @@
         })();
 
         // ===== FUNCIÓN DE LOGIN =====
-        function verificarLoginInicial() {
-            const usuario = document.getElementById('login-usuario').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-            
-            if (!usuario || !password) {
-                mostrarNotificacion('❌ Complete todos los campos', 'error');
-                return;
-            }
-            
-            const usuarios = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIOS)) || {};
-            
-            if (usuarios[usuario] && usuarios[usuario].password === password) {
-                usuarioActual = {
-                    usuario: usuario,
-                    rol: usuarios[usuario].rol,
-                    nombre: usuarios[usuario].nombre,
-                    loginTime: new Date().getTime()
-                };
-                
-                localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIO, JSON.stringify(usuarioActual));
-                
-                document.getElementById('login-inicial').style.display = 'none';
-                document.getElementById('app-contenedor').style.display = 'block';
-                document.getElementById('usuario-actual').textContent = usuarios[usuario].nombre;
-                
-                mostrarNotificacion(`✅ Bienvenido ${usuarios[usuario].nombre}`, 'success');
-                crearListasProblemas();
-                actualizarTotalRegistros();
-            } else {
-                mostrarNotificacion('❌ Usuario o contraseña incorrectos', 'error');
-            }
-        }
-
+       function verificarLoginInicial() {
+    const usuario = document.getElementById('login-usuario').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    
+    if (!usuario || !password) {
+        mostrarNotificacion('❌ Complete todos los campos', 'error');
+        return;
+    }
+    
+    // ⚡ USAR LOS USUARIOS DEFINIDOS EN EL CÓDIGO, NO DEL LOCALSTORAGE
+    const USUARIOS_FIJOS = {
+        admin: { password: 'admin123', rol: 'admin', nombre: 'Administrador' },
+        cristian: { password: '1234', rol: 'admin', nombre: 'Administrador Principal' },
+        supervisor: { password: 'super123', rol: 'supervisor', nombre: 'Supervisor General' },
+        operario: { password: 'oper123', rol: 'operario', nombre: 'Operario de Campo' },
+        root: { password: 'root1234', rol: 'superadmin', nombre: 'Super Administrador' }
+    };
+    
+    if (USUARIOS_FIJOS[usuario] && USUARIOS_FIJOS[usuario].password === password) {
+        usuarioActual = {
+            usuario: usuario,
+            rol: USUARIOS_FIJOS[usuario].rol,
+            nombre: USUARIOS_FIJOS[usuario].nombre,
+            loginTime: new Date().getTime()
+        };
+        
+        // Guardar sesión actual (opcional, puedes eliminarlo si no quieres recordar sesión)
+        localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIO, JSON.stringify(usuarioActual));
+        
+        document.getElementById('login-inicial').style.display = 'none';
+        document.getElementById('app-contenedor').style.display = 'block';
+        document.getElementById('usuario-actual').textContent = USUARIOS_FIJOS[usuario].nombre;
+        
+        mostrarNotificacion(`✅ Bienvenido ${USUARIOS_FIJOS[usuario].nombre}`, 'success');
+        crearListasProblemas();
+        actualizarTotalRegistros();
+    } else {
+        mostrarNotificacion('❌ Usuario o contraseña incorrectos', 'error');
+    }
+}
         function cerrarSesion() {
             localStorage.removeItem(CONFIG.STORAGE_KEYS.USUARIO);
             usuarioActual = null;
@@ -986,3 +993,4 @@
     </script>
 </body>
 </html>
+
