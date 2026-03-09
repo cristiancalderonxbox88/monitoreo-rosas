@@ -110,11 +110,15 @@ const BASE_DATOS = {
 };
 
 // ===== USUARIOS POR DEFECTO =====
+// ===== USUARIOS POR DEFECTO =====
 const USUARIOS_DEFAULT = {
     admin: { password: 'admin123', rol: 'admin', nombre: 'Administrador secundario' },
     cristian: { password: '1234', rol: 'admin', nombre: 'Administrador Principal' },
     supervisor: { password: 'super123', rol: 'admin', nombre: 'Supervisor General' },
-    operario: { password: 'oper123', rol: 'operario', nombre: 'Operario de Campo' }
+    operario: { password: 'oper123', rol: 'operario', nombre: 'Operario de Campo' },
+    // 👑 NUEVO SUPERUSUARIO
+    root: { password: 'root1234', rol: 'superadmin', nombre: 'Super Administrador' },
+    superadmin: { password: 'masterkey', rol: 'superadmin', nombre: 'Control Total' }
 };
 
 // ===== VARIABLES GLOBALES =====
@@ -1460,5 +1464,6 @@ document.head.insertAdjacentHTML('beforeend', `
 </style>
 
 `);
+
 
 
