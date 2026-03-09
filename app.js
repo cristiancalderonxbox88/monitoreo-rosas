@@ -111,7 +111,8 @@ const BASE_DATOS = {
 
 // ===== USUARIOS POR DEFECTO =====
 const USUARIOS_DEFAULT = {
-    admin: { password: 'admin123', rol: 'admin', nombre: 'Administrador Principal' },
+    admin: { password: 'admin123', rol: 'admin', nombre: 'Administrador secundario' },
+    cristian: { password: '1234', rol: 'admin', nombre: 'Administrador Principal' },
     supervisor: { password: 'super123', rol: 'supervisor', nombre: 'Supervisor General' },
     operario: { password: 'oper123', rol: 'operario', nombre: 'Operario de Campo' }
 };
@@ -1457,4 +1458,5 @@ document.head.insertAdjacentHTML('beforeend', `
     .badge-danger { background: #dc3545; color: white; }
     .badge-info { background: #17a2b8; color: white; }
 </style>
+
 `);
