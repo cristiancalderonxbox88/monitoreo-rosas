@@ -6,7 +6,7 @@
     <title>Sistema Monitoreo Rosas 🌹</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#d63384">
+    <meta name="theme-color" content="#335ed6">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
@@ -40,8 +40,8 @@
                     </button>
                 </div>
                 <div class="login-info">
-                    <p>Usuarios por defecto:</p>
-                    <small>admin/admin123 | cristian/1234 | supervisor/super123 | operario/oper123</small>
+                    <p>Usuarios disponibles:</p>
+                    <small>admin/admin123 | cristian/1234 | supervisor/super123 | operario/oper123 | root/root1234</small>
                 </div>
             </div>
         </div>
@@ -70,33 +70,11 @@
             </div>
             
             <div class="admin-contenido">
-                <!-- Gestión de Usuarios -->
+                <!-- Gestión de Usuarios (SOLO LECTURA) -->
                 <div id="admin-usuarios" class="admin-seccion activa">
-                    <h3><i class="fas fa-user-plus"></i> Gestión de Usuarios</h3>
-                    <div class="admin-formulario">
-                        <div class="campo">
-                            <label for="nuevo-usuario">Usuario:</label>
-                            <input type="text" id="nuevo-usuario" placeholder="Nombre de usuario">
-                        </div>
-                        <div class="campo">
-                            <label for="nueva-password">Contraseña:</label>
-                            <input type="password" id="nueva-password" placeholder="Contraseña">
-                        </div>
-                        <div class="campo">
-                            <label for="nuevo-rol">Rol:</label>
-                            <select id="nuevo-rol">
-                                <option value="admin">Administrador</option>
-                                <option value="supervisor">Supervisor</option>
-                                <option value="operario">Operario</option>
-                            </select>
-                        </div>
-                        <div class="campo">
-                            <label for="nuevo-nombre">Nombre completo:</label>
-                            <input type="text" id="nuevo-nombre" placeholder="Nombre completo">
-                        </div>
-                        <button class="btn-admin" onclick="agregarUsuario()">
-                            <i class="fas fa-plus"></i> Agregar Usuario
-                        </button>
+                    <h3><i class="fas fa-user-plus"></i> Usuarios del Sistema (Fijos)</h3>
+                    <div class="admin-info" style="background: #e3f2fd; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                        <p><i class="fas fa-info-circle"></i> Los usuarios son fijos y solo pueden modificarse en el código.</p>
                     </div>
                     
                     <div class="admin-lista">
@@ -426,7 +404,7 @@
         </div>
     </div>
 
-    <!-- Script con TODO el código necesario -->
+    <!-- Script con TODO el código (TÚ CONTROLAS LOS USUARIOS) -->
     <script>
         // ===== CONFIGURACIÓN GLOBAL =====
         const CONFIG = {
@@ -434,7 +412,6 @@
             STORAGE_KEYS: {
                 REGISTROS: 'registros_rosas',
                 USUARIO: 'usuario_sesion',
-                USUARIOS: 'usuarios_sistema',
                 CONTENIDO: 'contenido_sistema',
                 CONFIGURACION: 'configuracion_sistema',
                 BACKUP_PREFIX: 'backup_rosas_'
@@ -507,490 +484,95 @@
             }
         };
 
-        // ===== USUARIOS POR DEFECTO =====
-        const USUARIOS_DEFAULT = {
+        // ===== USUARIOS FIJOS (TÚ LOS CONTROLAS) =====
+        const USUARIOS_FIJOS = {
             admin: { password: 'admin123', rol: 'admin', nombre: 'Administrador' },
             cristian: { password: '1234', rol: 'admin', nombre: 'Administrador Principal' },
             supervisor: { password: 'super123', rol: 'supervisor', nombre: 'Supervisor General' },
-            operario: { password: 'oper123', rol: 'operario', nombre: 'Operario de Campo' }
+            operario: { password: 'oper123', rol: 'operario', nombre: 'Operario de Campo' },
+            root: { password: 'root1234', rol: 'superadmin', nombre: 'Super Administrador' }
+            // 👑 Agrega aquí más usuarios si quieres:
+            // ana: { password: 'ana2024', rol: 'supervisor', nombre: 'Ana López' },
+            // carlos: { password: 'carlos2024', rol: 'operario', nombre: 'Carlos Ruiz' }
         };
 
         // ===== VARIABLES GLOBALES =====
         let graficos = {};
         let usuarioActual = null;
 
-        // ===== INICIALIZACIÓN =====
-       /*(function() {
+        // ===== INICIALIZACIÓN BÁSICA (SIN USUARIOS AUTOMÁTICOS) =====
+        (function() {
             console.log('🚀 Inicializando sistema...');
             
-            if (!localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIOS)) {
-                localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIOS, JSON.stringify(USUARIOS_DEFAULT));
-                console.log('✅ Usuarios por defecto creados');
-            }*/
-            
+            // SOLO configurar fecha, NADA de usuarios automáticos
             const hoy = new Date().toISOString().split('T')[0];
             const fechaInput = document.getElementById('fecha');
             if (fechaInput) fechaInput.value = hoy;
             
+            // Restaurar sesión si existe (opcional)
             const sesionGuardada = localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIO);
             if (sesionGuardada) {
                 try {
                     usuarioActual = JSON.parse(sesionGuardada);
-                    document.getElementById('login-inicial').style.display = 'none';
-                    document.getElementById('app-contenedor').style.display = 'block';
-                    document.getElementById('usuario-actual').textContent = usuarioActual.nombre;
-                    console.log('✅ Sesión restaurada');
+                    // Verificar que el usuario aún existe en USUARIOS_FIJOS
+                    if (USUARIOS_FIJOS[usuarioActual.usuario]) {
+                        document.getElementById('login-inicial').style.display = 'none';
+                        document.getElementById('app-contenedor').style.display = 'block';
+                        document.getElementById('usuario-actual').textContent = usuarioActual.nombre;
+                    } else {
+                        localStorage.removeItem(CONFIG.STORAGE_KEYS.USUARIO);
+                        usuarioActual = null;
+                    }
                 } catch (e) {
                     console.error('Error al restaurar sesión:', e);
                 }
             }
         })();
 
-        // ===== FUNCIÓN DE LOGIN =====
-       function verificarLoginInicial() {
-    const usuario = document.getElementById('login-usuario').value.trim();
-    const password = document.getElementById('login-password').value.trim();
-    
-    if (!usuario || !password) {
-        mostrarNotificacion('❌ Complete todos los campos', 'error');
-        return;
-    }
-    
-    // ⚡ USAR LOS USUARIOS DEFINIDOS EN EL CÓDIGO, NO DEL LOCALSTORAGE
-    const USUARIOS_FIJOS = {
-        admin: { password: 'admin123', rol: 'admin', nombre: 'Administrador' },
-        cristian: { password: '1234', rol: 'admin', nombre: 'Administrador Principal' },
-        supervisor: { password: 'super123', rol: 'supervisor', nombre: 'Supervisor General' },
-        operario: { password: 'oper123', rol: 'operario', nombre: 'Operario de Campo' },
-        root: { password: 'root1234', rol: 'superadmin', nombre: 'Super Administrador' }
-    };
-    
-    if (USUARIOS_FIJOS[usuario] && USUARIOS_FIJOS[usuario].password === password) {
-        usuarioActual = {
-            usuario: usuario,
-            rol: USUARIOS_FIJOS[usuario].rol,
-            nombre: USUARIOS_FIJOS[usuario].nombre,
-            loginTime: new Date().getTime()
-        };
-        
-        // Guardar sesión actual (opcional, puedes eliminarlo si no quieres recordar sesión)
-        localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIO, JSON.stringify(usuarioActual));
-        
-        document.getElementById('login-inicial').style.display = 'none';
-        document.getElementById('app-contenedor').style.display = 'block';
-        document.getElementById('usuario-actual').textContent = USUARIOS_FIJOS[usuario].nombre;
-        
-        mostrarNotificacion(`✅ Bienvenido ${USUARIOS_FIJOS[usuario].nombre}`, 'success');
-        crearListasProblemas();
-        actualizarTotalRegistros();
-    } else {
-        mostrarNotificacion('❌ Usuario o contraseña incorrectos', 'error');
-    }
-}
-        function cerrarSesion() {
-            localStorage.removeItem(CONFIG.STORAGE_KEYS.USUARIO);
-            usuarioActual = null;
-            document.getElementById('app-contenedor').style.display = 'none';
-            document.getElementById('login-inicial').style.display = 'flex';
-            mostrarNotificacion('👋 Sesión cerrada', 'info');
-        }
-
-        function mostrarNotificacion(mensaje, tipo = 'info') {
-            const container = document.getElementById('notificaciones');
-            const id = 'notif-' + Date.now();
+        // ===== FUNCIÓN DE LOGIN (USA USUARIOS FIJOS) =====
+        function verificarLoginInicial() {
+            const usuario = document.getElementById('login-usuario').value.trim();
+            const password = document.getElementById('login-password').value.trim();
             
-            const notificacion = document.createElement('div');
-            notificacion.className = `notificacion ${tipo}`;
-            notificacion.id = id;
-            
-            const iconos = {
-                error: 'fa-times-circle',
-                warning: 'fa-exclamation-triangle',
-                success: 'fa-check-circle',
-                info: 'fa-info-circle'
-            };
-            
-            notificacion.innerHTML = `
-                <i class="fas ${iconos[tipo]}"></i>
-                <span>${mensaje}</span>
-            `;
-            
-            container.appendChild(notificacion);
-            setTimeout(() => notificacion.remove(), 3000);
-        }
-
-        function crearListasProblemas() {
-            const contenedores = ['enfermedades-lista', 'plagas-lista', 'manejo-lista', 'mantenimiento-lista'];
-            const categorias = Object.values(CATEGORIAS_PROBLEMAS);
-            
-            contenedores.forEach((contId, idx) => {
-                const contenedor = document.getElementById(contId);
-                if (!contenedor) return;
-                
-                contenedor.innerHTML = '';
-                categorias[idx].forEach(problema => {
-                    const id = problema.toLowerCase().replace(/ /g, '_');
-                    const div = document.createElement('div');
-                    div.className = 'item';
-                    div.innerHTML = `
-                        <div style="display: flex; align-items: center; flex: 1;">
-                            <input type="checkbox" id="chk_${id}" onchange="toggleSeveridad('${id}')">
-                            <label for="chk_${id}">${problema}</label>
-                        </div>
-                        <select id="sel_${id}" style="display: none; width: 70px;" onchange="actualizarResumen()">
-                            <option value="0">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                        </select>
-                    `;
-                    contenedor.appendChild(div);
-                });
-            });
-        }
-
-        function toggleSeveridad(id) {
-            const checkbox = document.getElementById(`chk_${id}`);
-            const select = document.getElementById(`sel_${id}`);
-            
-            if (checkbox.checked) {
-                select.style.display = 'inline-block';
-                select.value = '1';
-            } else {
-                select.style.display = 'none';
-                select.value = '0';
-            }
-            actualizarResumen();
-        }
-
-        function actualizarResumen() {
-            let puntosEstimados = 0;
-            let totalProblemas = 0;
-            
-            for (let i = 4; i < ENCABEZADO_EXCEL.length - 1; i++) {
-                const problema = ENCABEZADO_EXCEL[i];
-                const id = problema.toLowerCase().replace(/ /g, '_');
-                const checkbox = document.getElementById(`chk_${id}`);
-                const select = document.getElementById(`sel_${id}`);
-                
-                if (checkbox && checkbox.checked) {
-                    totalProblemas++;
-                    puntosEstimados += parseInt(select.value) || 1;
-                }
-            }
-            
-            document.getElementById('puntos-totales').textContent = puntosEstimados;
-            document.getElementById('total-problemas').textContent = totalProblemas;
-        }
-
-        function cargarVariedades() {
-            const bloque = document.getElementById('bloque').value;
-            const selectVariedad = document.getElementById('variedad');
-            const selectCama = document.getElementById('nro_cama');
-            
-            selectVariedad.innerHTML = '<option value="">Seleccione variedad</option>';
-            selectCama.innerHTML = '<option value="">Primero seleccione variedad</option>';
-            selectCama.disabled = true;
-            
-            if (!bloque) {
-                selectVariedad.disabled = true;
-                return;
-            }
-            
-            selectVariedad.disabled = false;
-            const variedades = BASE_DATOS[bloque] ? Object.keys(BASE_DATOS[bloque]) : [];
-            
-            variedades.forEach(variedad => {
-                const option = document.createElement('option');
-                option.value = variedad;
-                option.textContent = variedad;
-                selectVariedad.appendChild(option);
-            });
-        }
-
-        function cargarCamas() {
-            const bloque = document.getElementById('bloque').value;
-            const variedad = document.getElementById('variedad').value;
-            const selectCama = document.getElementById('nro_cama');
-            
-            selectCama.innerHTML = '<option value="">Seleccione cama</option>';
-            
-            if (!bloque || !variedad) {
-                selectCama.disabled = true;
-                return;
-            }
-            
-            selectCama.disabled = false;
-            const camas = BASE_DATOS[bloque] && BASE_DATOS[bloque][variedad] ? 
-                Object.keys(BASE_DATOS[bloque][variedad]) : [];
-            
-            camas.sort((a, b) => parseInt(a) - parseInt(b)).forEach(cama => {
-                const option = document.createElement('option');
-                option.value = cama;
-                option.textContent = `Cama ${cama}`;
-                selectCama.appendChild(option);
-            });
-        }
-
-        function cargarCodigo() {
-            const bloque = document.getElementById('bloque').value;
-            const variedad = document.getElementById('variedad').value;
-            const cama = document.getElementById('nro_cama').value;
-            const inputCodigo = document.getElementById('codigo');
-            
-            if (bloque && variedad && cama) {
-                const codigo = BASE_DATOS[bloque] && BASE_DATOS[bloque][variedad] && 
-                    BASE_DATOS[bloque][variedad][cama] || '';
-                inputCodigo.value = codigo;
-            } else {
-                inputCodigo.value = '';
-            }
-        }
-
-        function guardarRegistro() {
-            const fecha = document.getElementById('fecha').value;
-            const bloque = document.getElementById('bloque').value;
-            const variedad = document.getElementById('variedad').value;
-            const cama = document.getElementById('nro_cama').value;
-            const codigo = document.getElementById('codigo').value;
-            
-            if (!bloque || !variedad || !cama) {
-                mostrarNotificacion('❌ Seleccione Bloque, Variedad y Cama', 'error');
-                return;
-            }
-            
-            const registro = {
-                fecha: fecha,
-                bloque: bloque,
-                variedad: variedad,
-                nro_cama: cama,
-                codigo: codigo,
-                timestamp: new Date().getTime(),
-                usuario: usuarioActual ? usuarioActual.nombre : 'Visitante'
-            };
-            
-            let totalGeneral = 0;
-            
-            for (let i = 4; i < ENCABEZADO_EXCEL.length - 1; i++) {
-                const problema = ENCABEZADO_EXCEL[i];
-                const id = problema.toLowerCase().replace(/ /g, '_');
-                const checkbox = document.getElementById(`chk_${id}`);
-                const select = document.getElementById(`sel_${id}`);
-                
-                let valor = 0;
-                if (checkbox && checkbox.checked) {
-                    valor = parseInt(select.value) || 1;
-                }
-                
-                registro[problema] = valor;
-                totalGeneral += valor;
-            }
-            
-            registro["TOTAL GENERAL"] = totalGeneral;
-            
-            let registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
-            registros.push(registro);
-            localStorage.setItem(CONFIG.STORAGE_KEYS.REGISTROS, JSON.stringify(registros));
-            
-            actualizarTotalRegistros();
-            mostrarNotificacion(`✅ Registro guardado: ${totalGeneral} puntos`, 'success');
-            limpiarProblemas();
-        }
-
-        function limpiarProblemas() {
-            for (let i = 4; i < ENCABEZADO_EXCEL.length - 1; i++) {
-                const problema = ENCABEZADO_EXCEL[i];
-                const id = problema.toLowerCase().replace(/ /g, '_');
-                const checkbox = document.getElementById(`chk_${id}`);
-                const select = document.getElementById(`sel_${id}`);
-                
-                if (checkbox) checkbox.checked = false;
-                if (select) {
-                    select.style.display = 'none';
-                    select.value = '0';
-                }
-            }
-            actualizarResumen();
-        }
-
-        function limpiarFormulario() {
-            document.getElementById('bloque').selectedIndex = 0;
-            document.getElementById('variedad').innerHTML = '<option value="">Primero seleccione bloque</option>';
-            document.getElementById('variedad').disabled = true;
-            document.getElementById('nro_cama').innerHTML = '<option value="">Primero seleccione variedad</option>';
-            document.getElementById('nro_cama').disabled = true;
-            document.getElementById('codigo').value = '';
-            limpiarProblemas();
-        }
-
-        function exportarExcelPerfecto() {
-            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
-            
-            if (registros.length === 0) {
-                mostrarNotificacion('📭 No hay registros', 'warning');
-                return;
-            }
-            
-            let csv = ENCABEZADO_EXCEL.join(';') + '\\n';
-            
-            registros.forEach(reg => {
-                let fila = ENCABEZADO_EXCEL.map(col => {
-                    if (col === 'BLOQUE') return reg.bloque || '';
-                    if (col === 'VARIEDAD') return reg.variedad || '';
-                    if (col === 'NRO. CAMA') return reg.nro_cama || '';
-                    if (col === 'CODIGO') return reg.codigo || '';
-                    return reg[col] || 0;
-                });
-                csv += fila.join(';') + '\\n';
-            });
-            
-            const blob = new Blob(['\\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `MONITOREO_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-            
-            mostrarNotificacion(`✅ Exportados ${registros.length} registros`, 'success');
-        }
-
-        function actualizarTotalRegistros() {
-            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
-            document.getElementById('total-registros-header').textContent = registros.length;
-            
-            if (registros.length > 0) {
-                const ultimo = registros[registros.length - 1];
-                const fecha = new Date(ultimo.timestamp);
-                document.getElementById('ultima-sincronizacion').textContent = 
-                    fecha.toLocaleTimeString();
-                document.getElementById('ultimo-registro').textContent = 
-                    `${ultimo.variedad} (Cama ${ultimo.nro_cama})`;
-            }
-        }
-
-        function verRegistrosModal() {
-            document.getElementById('modalRegistros').style.display = 'flex';
-            const container = document.getElementById('lista-registros-container');
-            const registros = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]');
-            
-            if (registros.length === 0) {
-                container.innerHTML = '<div class="sin-registros">📭 No hay registros</div>';
-                return;
-            }
-            
-            registros.sort((a, b) => b.timestamp - a.timestamp);
-            
-            container.innerHTML = registros.map(reg => `
-                <div class="registro-item">
-                    <div>
-                        <div>${new Date(reg.timestamp).toLocaleString()}</div>
-                        <div>Bloque ${reg.bloque} - ${reg.variedad} - Cama ${reg.nro_cama}</div>
-                        <div>Total: ${reg["TOTAL GENERAL"]} puntos</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function cerrarModal() {
-            document.getElementById('modalRegistros').style.display = 'none';
-        }
-
-        function toggleModoOscuro() {
-            document.body.classList.toggle('modo-oscuro');
-            const btn = document.getElementById('toggle-modo');
-            btn.innerHTML = document.body.classList.contains('modo-oscuro') ? 
-                '<i class="fas fa-sun"></i> Modo Claro' : 
-                '<i class="fas fa-moon"></i> Modo Oscuro';
-        }
-
-        function abrirPanelAdmin() {
-            if (!usuarioActual || usuarioActual.rol !== 'admin') {
-                mostrarNotificacion('❌ Solo administradores', 'error');
-                return;
-            }
-            document.getElementById('admin-panel').style.display = 'flex';
-        }
-
-        function cerrarPanelAdmin() {
-            document.getElementById('admin-panel').style.display = 'none';
-        }
-
-        function cambiarAdminTab(tabId) {
-            document.querySelectorAll('.admin-seccion').forEach(s => s.classList.remove('activa'));
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('activa'));
-            document.querySelector(`[onclick="cambiarAdminTab('${tabId}')"]`).classList.add('activa');
-            document.getElementById(`admin-${tabId}`).classList.add('activa');
-        }
-
-        function agregarUsuario() {
-            const usuario = document.getElementById('nuevo-usuario').value;
-            const password = document.getElementById('nueva-password').value;
-            const rol = document.getElementById('nuevo-rol').value;
-            const nombre = document.getElementById('nuevo-nombre').value;
-            
-            if (!usuario || !password || !nombre) {
+            if (!usuario || !password) {
                 mostrarNotificacion('❌ Complete todos los campos', 'error');
                 return;
             }
             
-            const usuarios = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIOS));
-            usuarios[usuario] = { password, rol, nombre };
-            localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIOS, JSON.stringify(usuarios));
-            
-            mostrarNotificacion('✅ Usuario agregado', 'success');
-            cargarUsuariosEnPanel();
-        }
-
-        function cargarUsuariosEnPanel() {
-            const usuarios = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USUARIOS));
-            const lista = document.getElementById('lista-usuarios');
-            if (!lista) return;
-            
-            lista.innerHTML = Object.keys(usuarios).map(username => `
-                <div class="usuario-item">
-                    <div>
-                        <strong>${usuarios[username].nombre}</strong> (${username})
-                        <br><small>Rol: ${usuarios[username].rol}</small>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function guardarConfiguracion() {
-            mostrarNotificacion('✅ Configuración guardada', 'success');
-        }
-
-        function realizarBackup() {
-            mostrarNotificacion('📦 Backup realizado', 'success');
-        }
-
-        function enviarReporteWhatsApp() {
-            mostrarNotificacion('📱 Reporte enviado', 'success');
-        }
-
-        function eliminarTodosRegistros() {
-            if (confirm('¿Eliminar TODOS los registros?')) {
-                localStorage.removeItem(CONFIG.STORAGE_KEYS.REGISTROS);
+            // VERIFICAR CONTRA USUARIOS FIJOS (NO localStorage)
+            if (USUARIOS_FIJOS[usuario] && USUARIOS_FIJOS[usuario].password === password) {
+                usuarioActual = {
+                    usuario: usuario,
+                    rol: USUARIOS_FIJOS[usuario].rol,
+                    nombre: USUARIOS_FIJOS[usuario].nombre,
+                    loginTime: new Date().getTime()
+                };
+                
+                // Guardar sesión (opcional)
+                localStorage.setItem(CONFIG.STORAGE_KEYS.USUARIO, JSON.stringify(usuarioActual));
+                
+                document.getElementById('login-inicial').style.display = 'none';
+                document.getElementById('app-contenedor').style.display = 'block';
+                document.getElementById('usuario-actual').textContent = USUARIOS_FIJOS[usuario].nombre;
+                
+                mostrarNotificacion(`✅ Bienvenido ${USUARIOS_FIJOS[usuario].nombre}`, 'success');
+                crearListasProblemas();
                 actualizarTotalRegistros();
-                mostrarNotificacion('✅ Registros eliminados', 'success');
+                
+                // Actualizar panel de usuarios si está abierto
+                if (document.getElementById('admin-panel').style.display === 'flex') {
+                    cargarUsuariosEnPanel();
+                }
+            } else {
+                mostrarNotificacion('❌ Usuario o contraseña incorrectos', 'error');
+                document.querySelector('.login-inicial-form').style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    document.querySelector('.login-inicial-form').style.animation = '';
+                }, 500);
             }
         }
 
-        function cambiarPestana(pestanaId) {
-            document.querySelectorAll('.contenido-pestana').forEach(p => p.classList.remove('activa'));
-            document.querySelectorAll('.pestana').forEach(p => p.classList.remove('activa'));
-            document.querySelector(`[onclick="cambiarPestana('${pestanaId}')"]`).classList.add('activa');
-            document.getElementById(`pestana-${pestanaId}`).classList.add('activa');
-            
-            if (pestanaId === 'dashboard') {
-                setTimeout(actualizarDashboard, 100);
-            }
-        }
-
-        function actualizarDashboard() {
-            document.getElementById('kpi-registros').textContent = 
-                JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.REGISTROS) || '[]').length;
-        }
-    </script>
-</body>
-</html>
-
+        function cerrarSesion() {
+            localStorage.removeItem(CONFIG.STORAGE_KEYS.USUARIO);
+            usuarioActual = null;
+            document.getElementById('app-contenedor').style.display = 'none
