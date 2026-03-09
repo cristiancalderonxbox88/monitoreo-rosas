@@ -1086,10 +1086,10 @@ function actualizarPermisos(rol) {
         if (btnAdminPanel) btnAdminPanel.style.display = 'none';
     } else if (rol === 'supervisor') {
         botonesAdmin.forEach(btn => btn.style.display = 'flex');
-        if (btnAdminPanel) btnAdminPanel.style.display = 'none';
-    } else if (rol === 'admin') {
-        botonesAdmin.forEach(btn => btn.style.display = 'flex');
         if (btnAdminPanel) btnAdminPanel.style.display = 'flex';
+    } else if (rol === 'admin') {
+        botonesAdmin.forEach(btn => btn.style.display = 'none');
+        if (btnAdminPanel) btnAdminPanel.style.display = 'none';
     }
 }
 
@@ -1460,3 +1460,4 @@ document.head.insertAdjacentHTML('beforeend', `
 </style>
 
 `);
+
